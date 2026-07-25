@@ -1,26 +1,62 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-paper: #f4efe4;
+  --color-ink: #2c2620;
+  --color-ink-soft: #6b6255;
+  --color-wax: #7c2e39;
+  --color-ochre: #c08a2d;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-paper: var(--color-paper);
+  --color-ink: var(--color-ink);
+  --color-ink-soft: var(--color-ink-soft);
+  --color-wax: var(--color-wax);
+  --color-ochre: var(--color-ochre);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-display: var(--font-fraunces);
+  --font-body: var(--font-inter);
+  --font-script: var(--font-caveat);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+/* typewriter caret blink (used by the intro statement's typing animation) */
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* visible keyboard focus everywhere, in the wax accent rather than the browser default blue */
+:focus-visible {
+  outline: 2px solid var(--color-wax);
+  outline-offset: 3px;
+}
+
+/* toggled on <html> by components/cursor-trail.tsx while the ink-trail
+   cursor is active. an inline `cursor: none` on <body> alone only reaches
+   descendants by inheritance, and loses to any element with its own
+   explicit cursor (e.g. links/buttons carry a UA cursor: pointer) — so the
+   native arrow would reappear over those. !important on * beats that. */
+html.cursor-trail-active,
+html.cursor-trail-active * {
+  cursor: none !important;
+}
+
+/* envelope illustration tones only — not core brand tokens, scoped to the hero graphic so it stays easy to swap out */
+:root {
+  --color-kraft: #cda876;
+  --color-kraft-dark: #b3895a;
+  --color-kraft-line: #9c754a;
+}
+
+@theme inline {
+  --color-kraft: var(--color-kraft);
+  --color-kraft-dark: var(--color-kraft-dark);
+  --color-kraft-line: var(--color-kraft-line);
 }
