@@ -476,7 +476,7 @@ export function SnakeFold() {
           <h2 className="max-w-2xl font-heading text-3xl font-semibold leading-tight text-ink sm:text-4xl">
             snake game
           </h2>
-          <p className="mt-3 max-w-md font-body text-sm text-ink-soft sm:text-base">
+          <p className="mt-3 max-w-xs font-body text-sm text-ink-soft sm:text-base">
             i built this to keep myself sane while building this website talking
             about only and only myself....a bit of a task for me
           </p>
@@ -557,7 +557,7 @@ export function SnakeFold() {
               <h3 className="max-w-[18rem] font-display text-base italic text-ink sm:max-w-2xl sm:text-xl">
                 ready when you are
               </h3>
-              <p className="max-w-[18rem] font-body text-xs text-ink-soft sm:max-w-none sm:text-sm">
+              <p className="max-w-[18rem] font-body text-sm text-ink-soft sm:max-w-none sm:text-[15px]">
                 {isTouchDevice
                   ? "swipe to guide the snake. that's the whole tutorial. you've done harder things."
                   : "arrow keys. that's the whole tutorial. you've done harder things."}
@@ -568,10 +568,10 @@ export function SnakeFold() {
 
           {phase === "gameover" && !shouldReduceMotion && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2.5 bg-paper/90 px-4 text-center backdrop-blur-sm sm:gap-3 sm:px-6">
-              <span className="font-display text-xl italic text-ink sm:text-2xl">
+              <span className="font-display text-base italic text-ink sm:text-xl">
                 rip snake, 2007–now
               </span>
-              <span className="max-w-[20rem] font-body text-xs text-ink-soft sm:max-w-sm sm:text-sm">
+              <span className="max-w-[20rem] font-body text-sm text-ink-soft sm:max-w-sm sm:text-[15px]">
                 {isNewBest
                   ? `score: ${score} — new best! guess you're good at more than one thing.`
                   : `score: ${score}. not bad. now go look at the projects, they're more impressive than this score.`}
