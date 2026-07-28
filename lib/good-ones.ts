@@ -1,60 +1,54 @@
-// placeholder content for the "good ones" folder — swap these out once real
-// project write-ups are ready. `icon` picks one of the small abstract
-// anchors drawn in components/good-ones-folder.tsx (never a real
-// screenshot, just a simple shape hinting at the kind of work).
+// the four cards on the "some of the good ones" surface. each one has to
+// carry its own punchline: someone giving the site 30 seconds reads these
+// cards, not the case studies. `icon` picks one of the small abstract anchors
+// drawn in components/projects-fold.tsx (never a real screenshot, just a
+// simple shape hinting at the kind of work).
 export type GoodOneIcon = "chart" | "trend" | "compare" | "gauge";
 
 export type GoodOne = {
   id: string;
   title: string;
-  // one sentence: what she did + the outcome — no bullet lists. this is the
-  // teaser shown on the card face.
+  // one sentence: what i did + the outcome. no bullet lists.
   summary: string;
-  // the fuller write-up, revealed when the card's "read more" is opened —
-  // a few sentences, the story the teaser is standing in for.
-  detail: string;
   tags: string[];
   icon: GoodOneIcon;
+  // the live thing itself, where that's better proof than screenshots.
+  liveUrl?: string;
 };
-
-const PLACEHOLDER_DETAIL =
-  "placeholder detail — the fuller version of this story. what the problem was, what i actually built or shipped, the constraints i worked around, and the outcome it drove. swap this out for the real write-up once it's ready.";
 
 export const goodOnes: GoodOne[] = [
   {
-    id: "placeholder-one",
-    title: "project title one",
+    id: "acquisition-pipeline",
+    title: "the three-agent acquisition pipeline",
     summary:
-      "placeholder — what i did on this project and the outcome it led to, in one sentence.",
-    detail: PLACEHOLDER_DETAIL,
-    tags: ["product", "0 → 1"],
-    icon: "chart",
-  },
-  {
-    id: "placeholder-two",
-    title: "project title two",
-    summary:
-      "placeholder — what i did on this project and the outcome it led to, in one sentence.",
-    detail: PLACEHOLDER_DETAIL,
-    tags: ["strategy", "growth"],
+      "built the ai system that runs maqsad's acquisition and conversion, a lead classifier, a sales agent, and a campaign optimiser, and took qualified leads from 30% to 85% and conversion from 2% to 10%.",
+    tags: ["ai systems", "llm agents", "growth"],
     icon: "trend",
   },
   {
-    id: "placeholder-three",
-    title: "project title three",
+    id: "student-counsellor",
+    title: "the student counsellor",
     summary:
-      "placeholder — what i did on this project and the outcome it led to, in one sentence.",
-    detail: PLACEHOLDER_DETAIL,
-    tags: ["research", "redesign"],
-    icon: "compare",
+      "shipped an llm counsellor from zero that handles 500+ leads a day and cut manual chat handling by ~95%.",
+    tags: ["ai", "0-to-1", "ops"],
+    icon: "gauge",
   },
   {
-    id: "placeholder-four",
-    title: "project title four",
+    id: "zero-to-admission",
+    title: "zero to university admission",
     summary:
-      "placeholder — what i did on this project and the outcome it led to, in one sentence.",
-    detail: PLACEHOLDER_DETAIL,
-    tags: ["ops", "0 → 1", "solo"],
-    icon: "gauge",
+      "how the product evolved to take a student from signup all the way to a top-school admission.",
+    tags: ["product arc", "edtech", "retention"],
+    icon: "chart",
+  },
+  {
+    id: "fountain",
+    title: "growth for a traditional pump business",
+    summary:
+      "got my dad's offline pump business online from scratch, no team, no budget, and grew it.",
+    tags: ["0-to-1", "scrappy", "e-commerce"],
+    icon: "compare",
+    // TODO: the live fountain site — drop the real url in here.
+    liveUrl: undefined,
   },
 ];

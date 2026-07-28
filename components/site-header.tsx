@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { BrandMark } from "./brand-mark";
 
 // nav links — anchors for now; point them at real routes/sections once those
 // exist.
@@ -15,9 +15,7 @@ export function SiteHeader() {
   return (
     <header className="fixed inset-x-0 top-0 z-40 bg-paper/80 backdrop-blur">
       <nav className="mx-auto flex h-[4.75rem] max-w-[110rem] items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="font-script text-3xl leading-none text-ink sm:text-4xl">
-          dania siddiqui
-        </Link>
+        <BrandMark />
 
         <div className="hidden items-center gap-8 sm:flex">
           {NAV_LINKS.map((link) => (
@@ -33,7 +31,7 @@ export function SiteHeader() {
 
         <a
           href="#contact"
-          className="rounded-lg bg-ink px-4 py-2 font-body text-xs uppercase tracking-[0.15em] text-paper transition-colors hover:bg-ink/90"
+          className="rounded-lg bg-ink px-4 py-2 font-body text-xs uppercase tracking-[0.15em] text-paper shadow-sm transition duration-200 [transition-timing-function:var(--ease-out-quint)] hover:-translate-y-px hover:bg-ink/90 hover:shadow-md active:translate-y-0 active:scale-[0.97] motion-reduce:transform-none"
         >
           get in touch
         </a>

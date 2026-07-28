@@ -1,19 +1,16 @@
 import type { Metadata } from "next";
-import { Fraunces, Inter, Caveat } from "next/font/google";
+import { Caveat, Poppins } from "next/font/google";
 import "./globals.css";
 import { CursorTrail } from "@/components/cursor-trail";
 import { SiteHeader } from "@/components/site-header";
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+// poppins carries everything on the site — body copy, headings, the lot.
+// caveat is the only exception: the handwritten bits.
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
-});
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
 });
 
 const caveat = Caveat({
@@ -23,7 +20,7 @@ const caveat = Caveat({
 });
 
 export const metadata: Metadata = {
-  title: "dania siddiqui — product person, problem addict",
+  title: "dania siddiqui",
   description:
     "i get obsessed with problems — the thinking, the process, the chase. this is where i keep the good ones.",
 };
@@ -36,7 +33,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${inter.variable} ${caveat.variable} h-full antialiased`}
+      className={`${poppins.variable} ${caveat.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-body bg-paper text-ink">
         <SiteHeader />

@@ -6,6 +6,12 @@
   --color-ink-soft: #6b6255;
   --color-wax: #7c2e39;
   --color-ochre: #c08a2d;
+
+  /* shared motion vocabulary (from the animate skill). css transitions and
+     framer-motion both reach for these so timing feels consistent site-wide. */
+  --ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
+  --ease-out-cubic: cubic-bezier(0.33, 1, 0.68, 1);
 }
 
 @theme inline {
@@ -15,8 +21,12 @@
   --color-wax: var(--color-wax);
   --color-ochre: var(--color-ochre);
 
-  --font-display: var(--font-fraunces);
-  --font-body: var(--font-inter);
+  /* poppins everywhere. the display/body/heading split is kept so components
+     keep reading, but they all resolve to the same face now — only the
+     handwritten script is a different family. */
+  --font-display: var(--font-poppins);
+  --font-body: var(--font-poppins);
+  --font-heading: var(--font-poppins);
   --font-script: var(--font-caveat);
 }
 
@@ -25,10 +35,53 @@ body {
   color: var(--color-ink);
 }
 
-/* typewriter caret blink (used by the intro statement's typing animation) */
-@keyframes blink {
-  50% {
-    opacity: 0;
+/* highlighter marker — a bright yellow swipe that DRAWS ITSELF ON left to right
+   by animating background-size width from 0 to full. css owns this because
+   framer-motion won't interpolate background-size. box-decoration-clone keeps it
+   wrapping and drawing per-line. the animation runs on mount; in the pinned
+   about fold each chapter remounts, so it replays as you scroll into it. */
+.marker {
+  color: var(--color-ink);
+  background-color: transparent;
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 238, 0, 0) 0.5%,
+    rgba(255, 238, 0, 0.85) 2.5%,
+    rgba(255, 238, 0, 0.8) 96%,
+    rgba(255, 238, 0, 0) 99.5%
+  );
+  background-repeat: no-repeat;
+  background-position: left center;
+  /* default is UN-drawn (no yellow) so nothing looks pre-highlighted before you
+     reach it. the swipe only appears once the phrase scrolls into view and JS
+     adds `.marker--draw`, which draws it and holds it (animation fill: both). */
+  background-size: 0% 100%;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  padding: 0.08em 0.28em;
+  border-radius: 0.5em;
+}
+
+.marker--draw {
+  /* slower, so the left→right swipe reads; per-phrase delay is set inline
+     (via an `order` prop) so highlights in a chapter draw one after another. */
+  animation: marker-draw 2s var(--ease-out-cubic) both;
+}
+
+@keyframes marker-draw {
+  from {
+    background-size: 0% 100%;
+  }
+  to {
+    background-size: 100% 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marker--draw {
+    /* no swipe, but still show the highlight (base is now un-drawn) */
+    animation: none;
+    background-size: 100% 100%;
   }
 }
 

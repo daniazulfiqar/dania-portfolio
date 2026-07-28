@@ -130,10 +130,16 @@ export function SnakeFold() {
   const [phase, setPhase] = useState<Phase>("intro");
   const [score, setScore] = useState(0);
   const scoreRef = useRef(0);
-  // any previous best from this browser, read once at construction — kept
-  // in both a ref (for the imperative game loop) and state (for display).
+  // any previous best from this browser — kept in both a ref (for the
+  // imperative game loop) and state (for display). state starts at 0 so the
+  // first client render matches the server (which has no localStorage), then
+  // the stored value loads in after mount — avoids a hydration mismatch.
   const highScoreRef = useRef(readStoredHighScore());
-  const [highScore, setHighScore] = useState(readStoredHighScore);
+  const [highScore, setHighScore] = useState(0);
+
+  useEffect(() => {
+    setHighScore(readStoredHighScore());
+  }, []);
 
   const startGame = useCallback(() => {
     snake.current = initialSnake();
