@@ -2,8 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRef, useState, type PointerEvent } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState, type PointerEvent } from "react";
+import {
+  motion,
+  useAnimationControls,
+  useInView,
+  useReducedMotion,
+} from "framer-motion";
 import {
   goodOnes,
   type GoodOne,
@@ -63,7 +68,7 @@ const ROTATIONS = [-3, 2, -1, 4];
 // reveals in order: heading → description → sticky notes.
 const STAGGER_CONTAINER = {
   hidden: {},
-  shown: { transition: { staggerChildren: 0.1, delayChildren: 1.5 } },
+  shown: { transition: { staggerChildren: 0.1, delayChildren: 1.15 } },
 };
 
 const cardEntrance = {
@@ -252,6 +257,40 @@ export function ProjectsFold() {
   const shouldReduceMotion = useReducedMotion();
   const [hovered, setHovered] = useState<number | null>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
+
+  // the fold's entrance is driven imperatively so it plays exactly when we
+  // want and no more: once when it first scrolls into view (and then stays put
+  // — scrolling back up never hides or replays it), plus an explicit replay
+  // when someone jumps here via the WORK nav link (hash === "#work"). both the
+  // heading block and the card row share these controls so they stay in step.
+  const sectionRef = useRef<HTMLElement>(null);
+  const inView = useInView(sectionRef, {
+    once: true,
+    margin: "0px 0px -15% 0px",
+  });
+  const reveal = useAnimationControls();
+  const hasRevealed = useRef(false);
+
+  useEffect(() => {
+    if (inView && !hasRevealed.current) {
+      hasRevealed.current = true;
+      reveal.start("shown");
+    }
+  }, [inView, reveal]);
+
+  useEffect(() => {
+    const replayIfWork = () => {
+      if (window.location.hash === "#work") {
+        // re-hide then re-run, so the arrival animates even after it's already
+        // been revealed once by scrolling.
+        reveal.set("hidden");
+        hasRevealed.current = true;
+        requestAnimationFrame(() => reveal.start("shown"));
+      }
+    };
+    window.addEventListener("hashchange", replayIfWork);
+    return () => window.removeEventListener("hashchange", replayIfWork);
+  }, [reveal]);
   // mouse drag-to-scroll. touch and trackpad use the container's native
   // horizontal scroll; only a mouse gets the click-and-drag behaviour. `moved`
   // guards the card links so a drag doesn't fire navigation on release.
@@ -300,12 +339,15 @@ export function ProjectsFold() {
   };
 
   return (
-    <section id="work" className="scroll-mt-24 bg-paper pt-10 pb-20 sm:pt-14 sm:pb-28">
+    <section
+      ref={sectionRef}
+      id="work"
+      className="scroll-mt-24 bg-paper pt-10 pb-20 sm:pt-14 sm:pb-28"
+    >
       <motion.div
         className="mx-auto max-w-[82rem] px-6"
         initial={shouldReduceMotion ? false : "hidden"}
-        whileInView="shown"
-        viewport={{ once: false, amount: 0.2, margin: "0px 0px -20% 0px" }}
+        animate={reveal}
       >
         <motion.h2
           aria-label={HEADING}
@@ -347,10 +389,7 @@ export function ProjectsFold() {
           className="flex snap-x snap-mandatory items-stretch gap-4 sm:gap-5"
           variants={STAGGER_CONTAINER}
           initial="hidden"
-          whileInView="shown"
-          // not `once` — so arriving here via the WORK nav link (after the fold
-          // has already been seen once) still replays the entrance each time.
-          viewport={{ once: false, amount: 0.2, margin: "0px 0px -15% 0px" }}
+          animate={reveal}
           onMouseLeave={() => setHovered(null)}
         >
           {goodOnes.map((project, i) => (

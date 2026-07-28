@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useInView, useReducedMotion } from "framer-motion";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 
 // classic grid-based Nokia snake: arrow keys, fixed tick, blocky segments on
 // a visible grid. no cursor-following, no free movement — the snake advances
@@ -88,7 +88,7 @@ function GameButton({
     <button
       type="button"
       onClick={onClick}
-      className="rounded-[0.4rem] border border-ink/20 bg-paper px-5 py-2 font-display text-base italic text-ink shadow-[0_2px_6px_rgba(44,38,32,0.12)] transition-colors hover:bg-ink/5 sm:px-6 sm:py-2.5 sm:text-lg"
+      className="rounded-[0.4rem] border border-ink/20 bg-paper px-4 py-1.5 font-display text-sm italic text-ink shadow-[0_2px_6px_rgba(44,38,32,0.12)] transition-colors hover:bg-ink/5 sm:px-5 sm:py-2 sm:text-base"
     >
       {children}
     </button>
@@ -462,28 +462,78 @@ export function SnakeFold() {
   return (
     <section
       ref={sectionRef}
-      className="flex min-h-screen flex-col items-center justify-center bg-paper px-4 py-12 sm:px-6 sm:py-16"
+      id="snake"
+      className="flex min-h-screen scroll-mt-24 items-center justify-center bg-paper px-4 py-20 sm:px-6"
     >
-      <p className="mb-3 text-center font-script text-2xl text-ink-soft sm:mb-4 sm:text-3xl">
-        a little trip down memory lane in case you got bored
-      </p>
+      {/* on desktop: text on the left, game on the right. stacks (text over
+          board) on mobile. */}
+      <div className="mx-auto grid w-full max-w-6xl items-center gap-8 lg:grid-cols-2 lg:gap-14">
+        {/* left column: same heading + description structure as the about /
+            projects folds — a bold font-heading title, then a font-body line,
+            all in the site's ink palette — plus the live score. centered on
+            mobile, left-aligned beside the board on desktop. */}
+        <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
+          <h2 className="max-w-2xl font-heading text-3xl font-semibold leading-tight text-ink sm:text-4xl">
+            snake game
+          </h2>
+          <p className="mt-3 max-w-md font-body text-sm text-ink-soft sm:text-base">
+            i built this to keep myself sane while building this website talking
+            about only and only myself....a bit of a task for me
+          </p>
 
-      {/* live score — only once a game has actually started, and big enough
-          to actually notice, unlike a small corner label. the best score is
-          a separate, smaller stat pinned to the game box itself, not here. */}
-      {phase !== "intro" && (
-        <div className="mb-4 flex items-baseline justify-center gap-2 sm:mb-6 sm:gap-3">
-          <span className="font-script text-xl text-ink-soft sm:text-3xl">score</span>
-          <span className="font-display text-3xl font-semibold text-ink sm:text-5xl">{score}</span>
+          {/* live score — only once a game has actually started, and big enough
+              to actually notice. the best score is a separate, smaller stat
+              pinned to the game box itself, not here. */}
+          {phase !== "intro" && (
+            <div className="mt-6 flex items-baseline gap-2 sm:gap-3">
+              <span className="font-script text-xl text-ink-soft sm:text-3xl">score</span>
+              <span className="font-display text-3xl font-semibold text-ink sm:text-5xl">{score}</span>
+            </div>
+          )}
         </div>
-      )}
 
-      {/* the board itself: paper background, a thin hairline border so it
-          reads as part of the page rather than a screen inside a device. */}
-      <div
-        className="relative mx-auto w-full max-w-[64rem] rounded-[0.75rem] border border-ink/15 p-1.5 shadow-[0_4px_16px_rgba(44,38,32,0.08)] sm:rounded-[1rem] sm:p-3"
-        style={{ backgroundColor: BOARD_BG }}
-      >
+        {/* right column — the board itself: paper background, a thin hairline
+            border so it reads as part of the page rather than a device. */}
+        <div
+          className="relative mx-auto w-full max-w-[40rem] rounded-[0.75rem] p-1.5 shadow-[0_4px_16px_rgba(44,38,32,0.08)] sm:rounded-[1rem] sm:p-3"
+          style={{ backgroundColor: BOARD_BG }}
+        >
+        {/* the frame draws itself when the fold scrolls into view — an svg rect
+            whose stroke traces the board outline (pathLength 0→1), like a square
+            being drawn by hand. it replaces a static border; reduced-motion
+            users just get the finished outline. */}
+        {/* drawn in the board's real pixel space (no stretched viewBox), so the
+            stroke traces a clean rounded rectangle. the svg is inset 1px and the
+            rect fills it, stroke centred on that edge. */}
+        <svg
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-[1px] z-20 overflow-visible"
+          style={{ width: "calc(100% - 2px)", height: "calc(100% - 2px)" }}
+          fill="none"
+        >
+          <motion.rect
+            x="0"
+            y="0"
+            width="100%"
+            height="100%"
+            rx="14"
+            ry="14"
+            stroke={`rgba(${FOOD_RGB}, 0.38)`}
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            // a touch of blur so the thicker stroke reads as a soft, smudgy
+            // hand-drawn line rather than a crisp ui border.
+            style={{ filter: "blur(0.6px)" }}
+            initial={{ pathLength: shouldReduceMotion ? 1 : 0 }}
+            whileInView={{ pathLength: 1 }}
+            // fire only once most of the board is actually on screen, so the
+            // draw plays as you arrive rather than finishing during the approach.
+            viewport={{ once: true, amount: 0.7 }}
+            transition={{ duration: 2.6, ease: [0.65, 0, 0.35, 1] }}
+          />
+        </svg>
+
         {/* best score — a small persistent stat pinned to the box itself
             rather than floating between the caption and the box. */}
         {highScore > 0 && (
@@ -504,10 +554,10 @@ export function SnakeFold() {
 
           {phase === "intro" && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-paper px-4 text-center sm:gap-4 sm:px-6">
-              <h3 className="max-w-[18rem] font-display text-lg italic text-ink sm:max-w-2xl sm:text-2xl">
-                before smartphones ruined our attention spans
+              <h3 className="max-w-[18rem] font-display text-base italic text-ink sm:max-w-2xl sm:text-xl">
+                ready when you are
               </h3>
-              <p className="max-w-[18rem] font-body text-sm text-ink-soft sm:max-w-none sm:text-base">
+              <p className="max-w-[18rem] font-body text-xs text-ink-soft sm:max-w-none sm:text-sm">
                 {isTouchDevice
                   ? "swipe to guide the snake. that's the whole tutorial. you've done harder things."
                   : "arrow keys. that's the whole tutorial. you've done harder things."}
@@ -518,10 +568,10 @@ export function SnakeFold() {
 
           {phase === "gameover" && !shouldReduceMotion && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2.5 bg-paper/90 px-4 text-center backdrop-blur-sm sm:gap-3 sm:px-6">
-              <span className="font-display text-2xl italic text-ink sm:text-3xl">
+              <span className="font-display text-xl italic text-ink sm:text-2xl">
                 rip snake, 2007–now
               </span>
-              <span className="max-w-[20rem] font-body text-sm text-ink-soft sm:max-w-sm sm:text-base">
+              <span className="max-w-[20rem] font-body text-xs text-ink-soft sm:max-w-sm sm:text-sm">
                 {isNewBest
                   ? `score: ${score} — new best! guess you're good at more than one thing.`
                   : `score: ${score}. not bad. now go look at the projects, they're more impressive than this score.`}
@@ -535,6 +585,7 @@ export function SnakeFold() {
               the snake game is paused for reduced motion.
             </div>
           )}
+        </div>
         </div>
       </div>
     </section>
