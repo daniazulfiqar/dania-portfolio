@@ -62,7 +62,10 @@ function AboutHeading({ started }: { started?: boolean }) {
 }
 
 // the scroll driver's height. one viewport per chapter, roughly — tune here.
-const WRAPPER_VH = 300;
+// kept just above 3× a viewport's worth of pin travel so each chapter gets a
+// comfortable dwell without a long dead-scroll tail after the last one resolves
+// (that tail was the bulk of the gap before the projects fold).
+const WRAPPER_VH = 200;
 
 const CHAPTER_LABELS = ["intro", "maqsad", "fountain"];
 
@@ -289,9 +292,10 @@ function MaqsadText() {
       context="Pakistan's largest ed-tech platform by scale and funding"
     >
       <motion.p variants={paraItem} className="mt-7 font-body text-base leading-relaxed text-ink-soft sm:text-base sm:leading-relaxed">
-        i owned and helped scale the{" "}
-        <Mark order={0}>mobile app, web app, and internal tools</Mark> the business runs
-        on. i started here as an intern, and have grown into a lead PM role
+        i own the{" "}
+        <Mark order={0}>mobile app, web app, and internal tools</Mark> the
+        business runs on, and have scaled all three. i started here as an intern,
+        and have grown into a lead PM role
         where i manage the tech team (designers, engineers, data analysts) and
         extend my
         input to the marketing and socials team (whatever&apos;s needed to help
@@ -434,10 +438,15 @@ function BoardScrap({
           like a scrap being tossed onto the board. lifts on hover like the
           polaroid. */}
       <motion.div
-        initial={{ scale: 0.8, y: 26, rotate: -8 }}
-        animate={{ scale: 1, y: 0, rotate: 0 }}
+        initial={{ scale: 0.72, y: -40, rotate: -14, opacity: 0 }}
+        animate={{ scale: 1, y: 0, rotate: 0, opacity: 1 }}
         whileHover={{ y: -6, scale: 1.05 }}
-        transition={{ type: "spring", stiffness: 300, damping: 15 }}
+        transition={{
+          type: "spring",
+          stiffness: 260,
+          damping: 12,
+          opacity: { duration: 0.2 },
+        }}
         className="cursor-pointer"
       >
         {children}
@@ -460,8 +469,8 @@ function ScrapboardStack({ active }: { active: number }) {
 
       {/* the tapes stack in a column beside the polaroid — maqsad sits up top,
           fountain lands below it. lifted a touch so the pair reads high. */}
-      <div className="-mt-10 flex flex-col items-start gap-6">
-        <AnimatePresence>
+      <div className="relative -mt-10 flex flex-col items-start gap-6">
+        <AnimatePresence mode="popLayout">
           {active >= 1 && (
             <BoardScrap keyName="maqsad">
               <TapedLogo logo={MAQSAD_LOGO} rotate={3} display={120} />
@@ -497,6 +506,12 @@ function PinnedChapters() {
   const ActiveChapter = CHAPTERS[active];
   const wrapperRef = useRef<HTMLDivElement>(null);
   const paneRef = useRef<HTMLDivElement>(null);
+  // scroll sets the *target* chapter; a paced stepper (below) walks the active
+  // chapter toward it one at a time. that way a fast flick that jumps the
+  // progress straight from intro into fountain still shows maqsad in between,
+  // instead of the middle chapter never mounting.
+  const targetRef = useRef(0);
+  const lastStepRef = useRef(0);
 
   const { scrollYProgress } = useScroll({
     target: wrapperRef,
@@ -518,13 +533,6 @@ function PinnedChapters() {
     io.observe(el);
     return () => io.disconnect();
   }, []);
-
-  // scroll sets the *target* chapter; a paced stepper (below) walks the active
-  // chapter toward it one at a time. that way a fast flick that jumps the
-  // progress straight from intro into fountain still shows maqsad in between,
-  // instead of the middle chapter never mounting.
-  const targetRef = useRef(0);
-  const lastStepRef = useRef(0);
 
   useMotionValueEvent(scrollYProgress, "change", (v) => {
     targetRef.current = chapterFromProgress(v);
@@ -669,7 +677,7 @@ export function AboutFold() {
   const pinned = usePinnedLayout();
 
   return (
-    <section id="about" className="bg-paper py-24 sm:py-28">
+    <section id="about" className="bg-paper pt-24 pb-12 sm:pt-28 sm:pb-14">
       <div>
         {pinned ? <PinnedChapters /> : <StackedChapters />}
       </div>
