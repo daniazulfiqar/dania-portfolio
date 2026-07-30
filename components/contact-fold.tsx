@@ -45,13 +45,14 @@ const LINKS: {
   { label: "dania.siddiqui2000@gmail.com", href: "mailto:dania.siddiqui2000@gmail.com", icon: "mail" },
   { label: "+923322344320", href: "tel:+923322344320", icon: "phone" },
   { label: "linkedin", href: "https://linkedin.com/in/daniazulfiqar", icon: "linkedin", external: true },
+  { label: "github", href: "https://github.com/daniazulfiqar", icon: "github", external: true },
   { label: "resume", href: "/Dania_Siddiqui_CV.pdf", icon: "resume", external: true },
 ];
 
 // small line icons, drawn in the same stroke idiom as the project-card anchors
 // so they read as part of the same hand. currentColor lets them inherit the
 // link's ink→wax hover.
-type ContactIcon = "mail" | "phone" | "linkedin" | "resume";
+type ContactIcon = "mail" | "phone" | "linkedin" | "github" | "resume";
 
 function Icon({ name }: { name: ContactIcon }) {
   const common = {
@@ -86,6 +87,12 @@ function Icon({ name }: { name: ContactIcon }) {
           <path d="M7.6 11v6" />
           <path d="M11.2 17v-6" />
           <path d="M11.2 13.6a2.4 2.4 0 0 1 4.8 0V17" />
+        </svg>
+      );
+    case "github":
+      return (
+        <svg {...common}>
+          <path d="M12 3a9 9 0 0 0-2.85 17.54c.45.08.6-.2.6-.43v-1.68c-2.45.53-3-1.09-3-1.09-.4-1.03-.98-1.3-.98-1.3-.8-.55.06-.54.06-.54.89.06 1.36.91 1.36.91.79 1.36 2.07.97 2.58.74.08-.58.31-.97.56-1.2-1.96-.22-4.02-.98-4.02-4.37 0-.97.34-1.75.91-2.37-.09-.22-.4-1.12.09-2.34 0 0 .74-.24 2.43.91a8.4 8.4 0 0 1 4.42 0c1.69-1.15 2.43-.91 2.43-.91.49 1.22.18 2.12.09 2.34.57.62.91 1.4.91 2.37 0 3.4-2.07 4.15-4.04 4.37.32.28.6.82.6 1.65v2.45c0 .23.15.51.6.43A9 9 0 0 0 12 3z" />
         </svg>
       );
     case "resume":

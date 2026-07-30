@@ -20,6 +20,7 @@ const caveat = Caveat({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://daniasiddiqui.vercel.app"),
   title: "dania siddiqui",
   description:
     "i get obsessed with problems — the thinking, the process, the chase. this is where i keep the good ones.",

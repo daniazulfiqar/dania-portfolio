@@ -2,10 +2,11 @@ import { BrandMark } from "./brand-mark";
 
 // nav links — anchors for now; point them at real routes/sections once those
 // exist.
-const NAV_LINKS = [
+const NAV_LINKS: { label: string; href: string; external?: boolean }[] = [
   { label: "about", href: "#about" },
   { label: "work", href: "#work" },
   { label: "contact", href: "#contact" },
+  { label: "resume", href: "/Dania_Siddiqui_CV.pdf", external: true },
 ];
 
 // fixed top nav, openwhen-style: a script wordmark on the left, spaced-out
@@ -22,6 +23,7 @@ export function SiteHeader() {
             <a
               key={link.label}
               href={link.href}
+              {...(link.external ? { target: "_blank", rel: "noreferrer" } : {})}
               className="font-body text-xs uppercase tracking-[0.15em] text-ink-soft transition-[color,transform] duration-200 [transition-timing-function:var(--ease-out-quint)] hover:-translate-y-px hover:text-ink motion-reduce:hover:translate-y-0"
             >
               {link.label}
