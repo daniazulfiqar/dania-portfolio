@@ -463,7 +463,7 @@ export function SnakeFold() {
     <section
       ref={sectionRef}
       id="snake"
-      className="flex min-h-screen scroll-mt-24 items-center justify-center bg-paper px-4 py-20 sm:px-6"
+      className="flex items-center justify-center bg-paper px-4 py-14 sm:px-6 sm:py-16"
     >
       {/* on desktop: text on the left, game on the right. stacks (text over
           board) on mobile. */}
@@ -476,9 +476,9 @@ export function SnakeFold() {
           <h2 className="max-w-2xl font-heading text-3xl font-semibold leading-tight text-ink sm:text-4xl">
             snake game
           </h2>
-          <p className="mt-3 max-w-xs font-body text-sm text-ink-soft sm:text-base">
-            i built this to keep myself sane while building this website talking
-            about only and only myself....a bit of a task for me
+          <p className="mt-3 max-w-sm font-body text-sm text-ink-soft sm:text-base">
+            i built this game to keep myself sane while making a website about
+            myself....turns out every job app needs one now (thanks ai)
           </p>
 
           {/* live score — only once a game has actually started, and big enough

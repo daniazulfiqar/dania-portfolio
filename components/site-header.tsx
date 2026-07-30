@@ -5,7 +5,6 @@ import { BrandMark } from "./brand-mark";
 const NAV_LINKS = [
   { label: "about", href: "#about" },
   { label: "work", href: "#work" },
-  { label: "game", href: "#snake" },
   { label: "contact", href: "#contact" },
 ];
 
@@ -23,7 +22,7 @@ export function SiteHeader() {
             <a
               key={link.label}
               href={link.href}
-              className="font-body text-xs uppercase tracking-[0.15em] text-ink-soft transition-colors hover:text-ink"
+              className="font-body text-xs uppercase tracking-[0.15em] text-ink-soft transition-[color,transform] duration-200 [transition-timing-function:var(--ease-out-quint)] hover:-translate-y-px hover:text-ink motion-reduce:hover:translate-y-0"
             >
               {link.label}
             </a>

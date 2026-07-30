@@ -27,7 +27,9 @@
   --font-display: var(--font-poppins);
   --font-body: var(--font-poppins);
   --font-heading: var(--font-poppins);
-  --font-script: var(--font-caveat);
+  /* the handwritten script has been retired — everything resolves to poppins
+     now, including anything still tagged `font-script`. */
+  --font-script: var(--font-poppins);
 }
 
 body {

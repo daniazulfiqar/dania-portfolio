@@ -1,14 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState, type ReactNode } from "react";
-import {
-  AnimatePresence,
-  motion,
-  useMotionValueEvent,
-  useReducedMotion,
-  useScroll,
-} from "framer-motion";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 // the section's heading. sits at the top of the right-hand column, above the
 // copy, and stays put while the chapters turn over beneath it. reveals a word
@@ -65,7 +59,13 @@ function AboutHeading({ started }: { started?: boolean }) {
 // kept just above 3× a viewport's worth of pin travel so each chapter gets a
 // comfortable dwell without a long dead-scroll tail after the last one resolves
 // (that tail was the bulk of the gap before the projects fold).
-const WRAPPER_VH = 200;
+// the scroll-lock root is a little taller than one screen. the pane pins for
+// that whole height; while it's pinned we capture the scroll and step chapters
+// instead of moving the page. the extra height past 100vh is the runway the
+// page scrolls through once you've passed the last chapter (or before the
+// first) — kept generous enough that even a fast flick lands inside the pinned
+// zone and gets caught rather than skipping past.
+const ROOT_VH = 140;
 
 const CHAPTER_LABELS = ["intro", "maqsad", "fountain"];
 
@@ -112,13 +112,6 @@ function Polaroid({ compact = false }: { compact?: boolean }) {
           className="object-cover"
         />
       </div>
-      <span
-        className={`absolute bottom-3 left-0 right-0 text-center font-script text-ink-soft ${
-          compact ? "text-sm" : "text-lg"
-        }`}
-      >
-        karachi, mostly
-      </span>
     </div>
   );
 }
@@ -400,13 +393,6 @@ const stackContainer = {
   center: { transition: { staggerChildren: 0.08, delayChildren: 0.04 } },
 };
 
-// which chapter is showing, from scroll progress through the wrapper.
-function chapterFromProgress(progress: number) {
-  if (progress < 1 / 3) return 0;
-  if (progress < 2 / 3) return 1;
-  return 2;
-}
-
 // the left board: the polaroid starts alone and centered; as you scroll into
 // each company's chapter its taped logo lands beside the others and everything
 // slides over to make room. nothing stacks on top of anything — they sit side
@@ -487,37 +473,37 @@ function ScrapboardStack({ active }: { active: number }) {
   );
 }
 
-// the pinned version: a tall wrapper drives scroll, the inner pane sticks for
-// its duration, and the two columns crossfade between chapters. no scroll
-// hijacking anywhere — sticky and a progress read, nothing else.
+// the pinned version: the root is a bit taller than one screen and the pane
+// sticks for its full height. while the pane is pinned we *capture* the scroll —
+// each gesture (a flick, a wheel notch, a swipe) steps exactly one chapter
+// instead of moving the page. only once you're at the last chapter going down,
+// or the first going up, does the page scroll on. so a fast flick can neither
+// skip the middle chapter nor blow straight past to the next section.
 function PinnedChapters() {
   const [active, setActive] = useState(0);
-  // +1 when scrolling forward into a later chapter, -1 back into an earlier
-  // one. drives which way the copy slides. a ref tracks the current chapter so
-  // the direction is computed without a stale closure.
+  // +1 when moving into a later chapter, -1 back into an earlier one. drives
+  // which way the copy slides. a ref mirrors it so handlers read it fresh.
   const [direction, setDirection] = useState(1);
-  // false until the pane has risen well into view. drives the heading + first
-  // chapter so they reveal *during the approach* and are fully there by the
-  // time the pane pins — you catch the animation, and it's never blank on
-  // arrival. (gating on scroll progress instead left a dead window at the pin,
-  // where the pane is stuck but progress is still ~0.)
   const [started, setStarted] = useState(false);
   const activeRef = useRef(0);
+  // when the current chapter arrived — its copy staggers in over ~1.4s from
+  // here, and the lock won't advance (or release) until that has elapsed, so a
+  // chapter is always fully readable before you can move off it.
+  const arrivedAtRef = useRef(0);
   const ActiveChapter = CHAPTERS[active];
-  const wrapperRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const paneRef = useRef<HTMLDivElement>(null);
-  // scroll sets the *target* chapter; a paced stepper (below) walks the active
-  // chapter toward it one at a time. that way a fast flick that jumps the
-  // progress straight from intro into fountain still shows maqsad in between,
-  // instead of the middle chapter never mounting.
-  const targetRef = useRef(0);
-  const lastStepRef = useRef(0);
 
-  const { scrollYProgress } = useScroll({
-    target: wrapperRef,
-    offset: ["start start", "end end"],
-  });
+  const go = useCallback((next: number, dir: number) => {
+    activeRef.current = next;
+    arrivedAtRef.current = performance.now();
+    setDirection(dir);
+    setActive(next);
+    setStarted(true);
+  }, []);
 
+  // reveal the heading + first chapter as the pane rises into view, so it's
+  // never blank on arrival.
   useEffect(() => {
     const el = paneRef.current;
     if (!el) return;
@@ -525,6 +511,9 @@ function PinnedChapters() {
       (entries) => {
         if (entries.some((e) => e.intersectionRatio >= 0.4)) {
           setStarted(true);
+          // intro reveals during the approach; start its readable-timer now so
+          // you're not made to wait again once the pane locks.
+          arrivedAtRef.current = performance.now();
           io.disconnect();
         }
       },
@@ -534,45 +523,114 @@ function PinnedChapters() {
     return () => io.disconnect();
   }, []);
 
-  useMotionValueEvent(scrollYProgress, "change", (v) => {
-    targetRef.current = chapterFromProgress(v);
-  });
-
+  // the scroll lock. `pinned()` is true while the root fully covers the viewport
+  // (the pane is stuck at the top). in that window every wheel/touch is HELD
+  // (the page can't move) unless you're already at the end you're scrolling
+  // toward — so the page can never reach the next section until you've stepped
+  // through every chapter. chapters advance on a fixed cooldown, so neither a
+  // slow drag nor a hard flick can run through more than one every STEP_COOLDOWN.
   useEffect(() => {
-    // minimum time each chapter stays up before the stepper advances, so no
-    // chapter is skipped past too fast to register.
-    const DWELL_MS = 380;
-    let raf = 0;
-    const tick = (t: number) => {
-      raf = requestAnimationFrame(tick);
+    const root = rootRef.current;
+    if (!root) return;
+    const last = CHAPTERS.length - 1;
+    // how long a chapter's copy takes to finish staggering in. the lock won't
+    // advance to the next chapter — or release to the next section at the ends —
+    // until the current chapter has been on screen at least this long.
+    const REVEAL_MS = 2000;
+
+    // the page position at which the pane is pinned. captured when we first
+    // lock; while holding we snap back to it every event, which undoes any
+    // inertial scroll that slipped past preventDefault (a hard trackpad flick).
+    let lockY: number | null = null;
+
+    // returns true if the input should be captured (page held). when it returns
+    // false the caller lets the event through so the page scrolls on.
+    const consume = (dir: number) => {
+      const r = root.getBoundingClientRect();
+      const isPinned = r.top <= 1 && r.bottom >= window.innerHeight - 1;
+      if (!isPinned) {
+        lockY = null;
+        return false;
+      }
+      if (lockY === null) lockY = window.scrollY + r.top; // lock this position
       const cur = activeRef.current;
-      const target = targetRef.current;
-      if (cur === target) return;
-      if (t - lastStepRef.current < DWELL_MS) return;
-      const step = target > cur ? 1 : -1;
-      const next = cur + step;
-      lastStepRef.current = t;
-      activeRef.current = next;
-      setDirection(step);
-      setActive(next);
+      const revealed = performance.now() - arrivedAtRef.current >= REVEAL_MS;
+      // at the edge in the travel direction: release only once this chapter has
+      // fully revealed; until then, hold so its content isn't cut short.
+      if ((dir > 0 && cur >= last) || (dir < 0 && cur <= 0)) {
+        if (revealed) {
+          lockY = null;
+          return false;
+        }
+        return true;
+      }
+      // otherwise advance — but only after the current chapter has finished
+      // appearing. either way, hold the page.
+      if (revealed) go(cur + dir, dir);
+      return true;
     };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+
+    // hold: block the event AND re-assert the locked scroll position, so
+    // momentum can't creep the page toward the next section.
+    const hold = (prevent: () => void) => {
+      prevent();
+      if (lockY !== null) window.scrollTo(0, lockY);
+    };
+
+    const onWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaY) < 1) return;
+      if (consume(e.deltaY > 0 ? 1 : -1)) hold(() => e.preventDefault());
+    };
+
+    let touchStartY: number | null = null;
+    const onTouchStart = (e: TouchEvent) => {
+      touchStartY = e.touches[0]?.clientY ?? null;
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      if (touchStartY == null) return;
+      const dy = touchStartY - (e.touches[0]?.clientY ?? touchStartY);
+      if (Math.abs(dy) < 6) return;
+      // reset the anchor each step so one swipe reads as one continuous gesture
+      touchStartY = e.touches[0]?.clientY ?? null;
+      if (consume(dy > 0 ? 1 : -1)) hold(() => e.preventDefault());
+    };
+    const onTouchEnd = () => {
+      touchStartY = null;
+    };
+
+    window.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: false });
+    window.addEventListener("touchend", onTouchEnd, { passive: true });
+    return () => {
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", onTouchEnd);
+    };
+  }, [go]);
+
+  // arriving via the ABOUT nav link should always start on the intro chapter.
+  useEffect(() => {
+    const reset = () => {
+      if (window.location.hash === "#about") {
+        activeRef.current = 0;
+        setDirection(1);
+        setActive(0);
+      }
+    };
+    window.addEventListener("hashchange", reset);
+    return () => window.removeEventListener("hashchange", reset);
   }, []);
 
-  // jump to a chapter when its dot is clicked: scroll to the point in the tall
-  // wrapper whose progress lands mid-chapter. sticky pinning does the rest.
+  // dots just switch chapters in place — no scrolling needed, the pane is pinned.
   const goToChapter = (i: number) => {
-    const el = wrapperRef.current;
-    if (!el) return;
-    const top = el.getBoundingClientRect().top + window.scrollY;
-    const distance = el.offsetHeight - window.innerHeight;
-    const progress = (i + 0.5) / CHAPTERS.length;
-    window.scrollTo({ top: top + progress * distance, behavior: "smooth" });
+    if (i === activeRef.current) return;
+    go(i, i > activeRef.current ? 1 : -1);
   };
 
   return (
-    <div ref={wrapperRef} style={{ height: `${WRAPPER_VH}vh` }}>
+    <div ref={rootRef} style={{ height: `${ROOT_VH}vh` }}>
       <div ref={paneRef} className="sticky top-0 flex h-screen items-center overflow-hidden px-6 pt-[4.75rem]">
         <div className="mx-auto grid w-full max-w-6xl grid-cols-[minmax(0,32rem)_1fr] items-center gap-8">
           {/* left: the scrapboard. polaroid first, then each company's taped
@@ -649,7 +707,7 @@ function StackedChapters() {
   };
 
   return (
-    <div className="mx-auto max-w-5xl space-y-20 px-6 py-4 sm:space-y-28">
+    <div className="mx-auto max-w-5xl space-y-20 px-6 pb-4 pt-24 sm:space-y-28 sm:pt-28">
       {/* the photo leads, then the chapters follow under it */}
       <motion.div
         className="grid items-center gap-10 md:grid-cols-[minmax(0,17rem)_1fr] md:gap-14"
@@ -677,7 +735,7 @@ export function AboutFold() {
   const pinned = usePinnedLayout();
 
   return (
-    <section id="about" className="bg-paper pt-24 pb-12 sm:pt-28 sm:pb-14">
+    <section id="about" className="bg-paper pb-12 sm:pb-14">
       <div>
         {pinned ? <PinnedChapters /> : <StackedChapters />}
       </div>

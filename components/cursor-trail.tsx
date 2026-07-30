@@ -145,7 +145,7 @@ export function CursorTrail() {
     <canvas
       ref={canvasRef}
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-50 mix-blend-multiply"
+      className="pointer-events-none fixed inset-0 z-[200] mix-blend-multiply"
     />
   );
 }

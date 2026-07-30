@@ -14,7 +14,7 @@ function AnimatedName() {
 
   return (
     <motion.span
-      className="font-script text-2xl leading-none sm:text-3xl"
+      className="font-heading text-base font-semibold leading-none tracking-tight sm:text-lg"
       initial="rest"
       animate="rest"
       whileHover={shouldReduceMotion ? undefined : "hover"}

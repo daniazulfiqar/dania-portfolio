@@ -13,6 +13,9 @@ import {
 
 const ENVELOPE_SRC = "/images/envelope/envelope-open.png";
 const PHOTO_SRC = "/dania.png";
+// the crowned claude mascot that pops out of the pocket alongside the note +
+// photo. intrinsic 1064×1176.
+const CLAUDE_SRC = "/images/claude_icon.png";
 
 const ENVELOPE_SIZES =
   "(min-width: 1536px) 66rem, (min-width: 1280px) 58rem, (min-width: 1024px) 50rem, (min-width: 768px) 34rem, (min-width: 640px) 26rem, 20rem";
@@ -197,6 +200,22 @@ export function EnvelopeHero() {
   const noteLeft = useTransform(scrollYProgress, [0.22, 0.65], ["20%", "9%"]);
   const noteRotate = useTransform(scrollYProgress, [0.12, 0.65], [5, -2]);
 
+  // the crowned claude mascot: tucked deep in the pocket at rest (hidden behind
+  // the front panel), then — once the photo has begun emerging — it rises up and
+  // settles just ABOVE the photo. right is offset from photoRight so its centre
+  // lines up over the photo.
+  // tracks just ABOVE the photo the whole way (photoBottom + ~31% photo height),
+  // so it never crosses over the polaroid; right is offset from photoRight to
+  // centre over it.
+  // rest bottom (18%) is deliberately low: at this element's width/rest
+  // x-span, its entire box sits below POCKET_CLIP's V-line, so the real
+  // front pocket panel (z-30) genuinely covers it — same mechanism as the
+  // photo/note, no opacity or clip-path fakery needed. it only starts rising
+  // once the photo is already moving (0.05, vs. the photo's 0), so it reads
+  // as following the photo out rather than appearing on its own.
+  const claudeBottom = useTransform(scrollYProgress, [0.05, 0.6], ["18%", "91%"]);
+  const claudeRight = useTransform(scrollYProgress, [0.18, 0.6], ["27%", "16%"]);
+
   // the whole envelope drifts up a touch and eases forward as you scroll, so
   // the scene feels alive rather than frozen while the note/photo come out.
   const envelopeY = useTransform(scrollYProgress, [0, 1], [0, -28]);
@@ -230,6 +249,12 @@ export function EnvelopeHero() {
   const noteStyle = shouldReduceMotion
     ? { zIndex: 20, left: "9%", bottom: "52%", rotate: -2 }
     : { zIndex: 20, left: noteLeft, bottom: noteBottom, rotate: noteRotate };
+
+  // positioned by `right` so it tracks above the photo. z 25 sits above the
+  // note/photo (z 10/20); it clears the front panel since it rides high.
+  const claudeStyle = shouldReduceMotion
+    ? { zIndex: 25, right: "16%", bottom: "84%", rotate: 0 }
+    : { zIndex: 25, right: claudeRight, bottom: claudeBottom, rotate: 0 };
 
   return (
     // this section is taller than the viewport on purpose: the extra height
@@ -374,6 +399,27 @@ export function EnvelopeHero() {
               </button>
             </motion.div>
 
+            {/* the crowned claude mascot — tucked inside the pocket at rest,
+                rising partway out on scroll, below the note + photo. */}
+            <motion.div
+              className="absolute w-[11%] cursor-pointer"
+              style={claudeStyle}
+              whileHover={shouldReduceMotion ? undefined : { y: -6 }}
+              transition={{ type: "spring", stiffness: 220, damping: 18 }}
+              aria-hidden="true"
+            >
+              <div className="relative aspect-[1064/1176] w-full drop-shadow-[0_6px_12px_rgba(44,38,32,0.3)]">
+                <Image
+                  src={CLAUDE_SRC}
+                  alt=""
+                  aria-hidden="true"
+                  fill
+                  sizes="(min-width: 1024px) 9rem, 5rem"
+                  className="object-contain"
+                />
+              </div>
+            </motion.div>
+
             {/* envelope FRONT pocket panel (top layer) — a clipped copy of
                 the very same artwork, perfectly aligned over the back layer.
                 because it's painted above the note/photo (z 30 > 20/10) it
@@ -397,11 +443,11 @@ export function EnvelopeHero() {
               transition={{ duration: 0.3, ease: "easeOut" }}
               aria-hidden="true"
             >
-              <span className="font-script text-lg">scroll</span>
+              <span className="font-script text-xs">scroll</span>
               <motion.span
                 animate={shouldReduceMotion ? undefined : { y: [0, 6, 0] }}
                 transition={{ duration: 1.4, ease: "easeInOut", repeat: Infinity }}
-                className="text-base leading-none"
+                className="text-xs leading-none"
               >
                 ↓
               </motion.span>

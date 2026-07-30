@@ -1,0 +1,197 @@
+"use client";
+
+import ReactMarkdown from "react-markdown";
+import type { Components } from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { DRAFT_NOTE } from "@/lib/case-studies";
+
+// a captioned dashed box standing in for a diagram/screenshot until the real
+// asset is dropped in. every image + author "screenshot to add here" note in
+// the source renders through here (see lib/case-study-content.ts).
+function ImagePlaceholder({ caption }: { caption?: string }) {
+  return (
+    <span className="my-8 flex flex-col items-center gap-3">
+      <span className="flex aspect-[16/9] w-full items-center justify-center rounded-lg border border-dashed border-ink/25 bg-ink/[0.03] text-ink/25">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="h-8 w-8"
+          aria-hidden="true"
+        >
+          <rect x="3" y="4" width="18" height="16" rx="2" />
+          <circle cx="8.5" cy="9.5" r="1.5" />
+          <path d="m3 16 5-4 4 3 3-2 6 5" />
+        </svg>
+      </span>
+      {caption && (
+        <span className="max-w-xl text-center font-body text-xs leading-relaxed text-ink-soft">
+          {caption}
+        </span>
+      )}
+    </span>
+  );
+}
+
+// maps every markdown node to the site's paper/ink theme. headings take the
+// wax accent (like the rest of the site), tables scroll on narrow screens,
+// and images become captioned placeholders.
+const components: Components = {
+  h1: ({ children }) => (
+    <h2 className="mb-4 mt-14 font-heading text-2xl font-semibold text-wax">
+      {children}
+    </h2>
+  ),
+  h2: ({ children }) => (
+    <h2 className="mb-4 mt-14 font-heading text-2xl font-semibold text-wax">
+      {children}
+    </h2>
+  ),
+  h3: ({ children }) => (
+    <h3 className="mb-2 mt-8 font-heading text-lg font-semibold text-ink">
+      {children}
+    </h3>
+  ),
+  p: ({ node, children }) => {
+    // standalone images arrive wrapped in a <p>; unwrap so the placeholder
+    // (a block) isn't nested inside a paragraph.
+    const kids = node?.children ?? [];
+    if (
+      kids.length === 1 &&
+      kids[0].type === "element" &&
+      kids[0].tagName === "img"
+    ) {
+      return <>{children}</>;
+    }
+    return (
+      <p className="my-4 font-body leading-relaxed text-ink-soft">{children}</p>
+    );
+  },
+  ul: ({ children }) => (
+    <ul className="my-4 flex list-disc flex-col gap-2 pl-5 font-body leading-relaxed text-ink-soft marker:text-ink/30">
+      {children}
+    </ul>
+  ),
+  ol: ({ children }) => (
+    <ol className="my-4 flex list-decimal flex-col gap-2 pl-5 font-body leading-relaxed text-ink-soft marker:text-ink/40">
+      {children}
+    </ol>
+  ),
+  li: ({ children }) => <li className="pl-1">{children}</li>,
+  a: ({ href, children }) => (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      className="text-wax underline underline-offset-2 hover:text-wax/80"
+    >
+      {children}
+    </a>
+  ),
+  strong: ({ children }) => (
+    <strong className="font-semibold text-ink">{children}</strong>
+  ),
+  em: ({ children }) => <em className="italic">{children}</em>,
+  blockquote: ({ children }) => (
+    <blockquote className="my-6 border-l-2 border-wax/40 pl-4 font-body italic leading-relaxed text-ink-soft">
+      {children}
+    </blockquote>
+  ),
+  hr: () => <hr className="my-12 border-ink/10" />,
+  img: ({ alt }) => <ImagePlaceholder caption={alt || undefined} />,
+  code: ({ children }) => (
+    <code className="rounded bg-ink/[0.06] px-1.5 py-0.5 font-mono text-[0.85em] text-ink">
+      {children}
+    </code>
+  ),
+  table: ({ children }) => (
+    <div className="my-6 overflow-x-auto">
+      <table className="w-full border-collapse text-left font-body text-sm">
+        {children}
+      </table>
+    </div>
+  ),
+  thead: ({ children }) => <thead>{children}</thead>,
+  th: ({ children }) => (
+    <th className="border-b border-ink/25 px-3 py-2 align-top font-semibold text-ink">
+      {children}
+    </th>
+  ),
+  td: ({ children }) => (
+    <td className="border-b border-ink/10 px-3 py-2 align-top text-ink-soft">
+      {children}
+    </td>
+  ),
+};
+
+// the interior of a case-study sticky note: the header (label, title, summary,
+// tags) and either the rendered markdown or the "still writing this" draft
+// note. rendered inside the in-page pop-up (components/case-study/case-study-modal),
+// which draws the taped note *shell* around it.
+export function CaseStudyNoteBody({
+  title,
+  summary,
+  tags,
+  markdown,
+}: {
+  title: string;
+  summary?: string;
+  tags?: string[];
+  markdown: string | null;
+}) {
+  // no markdown on disk yet → this study is still a draft.
+  if (!markdown) {
+    return (
+      <div className="text-center">
+        <p className="font-body text-xs uppercase tracking-[0.2em] text-ink/50">
+          case study
+        </p>
+        <h2 className="mx-auto mt-3 max-w-2xl font-heading text-3xl font-semibold leading-tight text-ink sm:text-4xl">
+          {title}
+        </h2>
+        <p className="mx-auto mt-6 max-w-xl font-body text-base italic leading-relaxed text-ink-soft">
+          {DRAFT_NOTE}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <header>
+        <p className="mb-3 font-body text-xs uppercase tracking-[0.2em] text-ink/50">
+          case study
+        </p>
+        <h2 className="font-heading text-3xl font-semibold leading-tight text-ink sm:text-4xl">
+          {title}
+        </h2>
+        {summary && (
+          <p className="mt-4 font-body text-lg leading-relaxed text-ink-soft">
+            {summary}
+          </p>
+        )}
+        {tags && tags.length > 0 && (
+          <ul className="mt-5 flex flex-wrap gap-1.5">
+            {tags.map((tag) => (
+              <li
+                key={tag}
+                className="rounded-full border border-ink/25 px-2.5 py-0.5 font-body text-[11px] text-ink-soft"
+              >
+                {tag}
+              </li>
+            ))}
+          </ul>
+        )}
+      </header>
+
+      <div className="mt-12 border-t border-ink/10 pt-10">
+        <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+          {markdown}
+        </ReactMarkdown>
+      </div>
+    </>
+  );
+}
