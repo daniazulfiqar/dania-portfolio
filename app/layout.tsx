@@ -21,7 +21,7 @@ const caveat = Caveat({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://daniasiddiqui.vercel.app"),
-  title: "hi, i'm dania - senior product manager + builder",
+  title: "dania siddiqui",
   description:
     "my work sits at the intersection of problem solving, using agents to execute almost everything, and building products that actually sell.",
 };

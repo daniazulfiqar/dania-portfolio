@@ -37,7 +37,7 @@ function AnimatedName() {
 export function BrandMark() {
   return (
     <Link href="/" className="group flex items-center gap-1 text-ink">
-      <TangleLogo className="h-7 w-9 shrink-0 sm:h-8 sm:w-10" />
+      <TangleLogo className="h-5 w-7 shrink-0 sm:h-6 sm:w-8" />
       <AnimatedName />
     </Link>
   );
