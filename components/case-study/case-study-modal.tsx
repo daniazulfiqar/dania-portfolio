@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { CaseStudyNoteBody } from "@/components/case-study/case-study-note";
 
@@ -18,11 +18,20 @@ export type OpenStudy = {
 export function CaseStudyModal({
   study,
   onClose,
+  onOpenStudy,
 }: {
   study: OpenStudy | null;
   onClose: () => void;
+  onOpenStudy?: (slug: string) => void;
 }) {
   const shouldReduceMotion = useReducedMotion();
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // when the open study changes (e.g. a cross-study link swaps the note in
+  // place), jump the scroll back to the top so the new study starts at its head.
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: 0 });
+  }, [study?.slug]);
 
   // close on escape, and lock the page scroll while the note is open so the
   // background doesn't drift behind it.
@@ -47,6 +56,7 @@ export function CaseStudyModal({
     // mount and unmounts instantly on close. (AnimatePresence's exit was leaving
     // the faded-out overlay mounted over the page, blocking every click.)
     <motion.div
+      ref={scrollRef}
       className="fixed inset-0 z-[100] flex justify-center overflow-y-auto overscroll-contain bg-ink/40 px-4 py-10 backdrop-blur-sm sm:px-8 sm:py-16"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -104,6 +114,7 @@ export function CaseStudyModal({
                 summary={study.summary}
                 tags={study.tags}
                 markdown={study.markdown}
+                onOpenStudy={onOpenStudy}
               />
             </article>
       </motion.div>

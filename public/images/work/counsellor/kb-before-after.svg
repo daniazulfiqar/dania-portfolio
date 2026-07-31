@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="10 -3 1040 399" font-family="Poppins, ui-sans-serif, system-ui, sans-serif">
+  <defs>
+    <marker id="kb-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#6b6255" />
+    </marker>
+  </defs>
+
+  <!-- column header: before -->
+  <text x="184" y="42" text-anchor="middle" font-size="20" font-weight="700" fill="#7c2e39">before</text>
+
+  <!-- BEFORE: one bloated prompt -->
+  <rect x="34" y="60" width="300" height="312" rx="14" fill="#fdfbf3" stroke="#2c2620" stroke-width="2.5" />
+  <text x="184" y="96" text-anchor="middle" font-size="15" font-weight="600" fill="#2c2620">everything in the prompt</text>
+  <g fill="#d9d2c4">
+    <rect x="62" y="120" width="244" height="9" rx="4" />
+    <rect x="62" y="138" width="220" height="9" rx="4" />
+    <rect x="62" y="156" width="244" height="9" rx="4" />
+    <rect x="62" y="174" width="200" height="9" rx="4" />
+    <rect x="62" y="192" width="236" height="9" rx="4" />
+    <rect x="62" y="210" width="244" height="9" rx="4" />
+    <rect x="62" y="228" width="210" height="9" rx="4" />
+    <rect x="62" y="246" width="244" height="9" rx="4" />
+    <rect x="62" y="264" width="190" height="9" rx="4" />
+    <rect x="62" y="282" width="230" height="9" rx="4" />
+  </g>
+  <text x="184" y="332" text-anchor="middle" font-size="13" font-style="italic" fill="#6b6255">behaviour + facts, all mixed</text>
+  <text x="184" y="356" text-anchor="middle" font-size="14" font-weight="600" fill="#7c2e39">huge — and it still hallucinated</text>
+
+  <!-- arrow -->
+  <line x1="340" y1="198" x2="422" y2="198" stroke="#6b6255" stroke-width="2.5" marker-end="url(#kb-arrow)" />
+
+  <!-- column header: after -->
+  <text x="728" y="42" text-anchor="middle" font-size="20" font-weight="700" fill="#7c2e39">after</text>
+
+  <!-- AFTER: prompt (behaviour) + knowledge base (facts) -->
+  <rect x="430" y="60" width="596" height="124" rx="14" fill="#fdfbf3" stroke="#2c2620" stroke-width="2.5" />
+  <text x="458" y="102" font-size="20" font-weight="600" fill="#2c2620">the prompt — behaviour only</text>
+  <text x="458" y="134" font-size="15" fill="#6b6255">persona · flow · rules · guardrails</text>
+  <text x="458" y="158" font-size="13" font-style="italic" fill="#6b6255">changes when the bot's behaviour should change</text>
+
+  <rect x="430" y="212" width="596" height="124" rx="14" fill="#fdfbf3" stroke="#c08a2d" stroke-width="3" />
+  <text x="458" y="254" font-size="20" font-weight="600" fill="#2c2620">knowledge base + file search — facts only</text>
+  <text x="458" y="286" font-size="15" fill="#6b6255">dates · paper patterns · merits · batch details</text>
+  <text x="458" y="310" font-size="13" font-style="italic" fill="#6b6255">fact-checked against, not carried in the prompt</text>
+</svg>

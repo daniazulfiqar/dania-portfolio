@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="16 16 838 454" font-family="Poppins, ui-sans-serif, system-ui, sans-serif">
+  <defs>
+    <marker id="tl-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#6b6255" />
+    </marker>
+  </defs>
+
+  <!-- the model (accent) -->
+  <rect x="40" y="180" width="210" height="120" rx="14" fill="#fdfbf3" stroke="#c08a2d" stroke-width="3" />
+  <text x="145" y="230" text-anchor="middle" font-size="22" font-weight="600" fill="#2c2620">the model</text>
+  <text x="145" y="260" text-anchor="middle" font-size="15" fill="#6b6255">reads context,</text>
+  <text x="145" y="281" text-anchor="middle" font-size="15" fill="#6b6255">decides what it needs</text>
+
+  <!-- arrow to decision -->
+  <line x1="250" y1="240" x2="322" y2="240" stroke="#6b6255" stroke-width="2.5" marker-end="url(#tl-arrow)" />
+
+  <!-- decision diamond -->
+  <polygon points="410,178 476,240 410,302 344,240" fill="#fdfbf3" stroke="#2c2620" stroke-width="2.5" />
+  <text x="410" y="235" text-anchor="middle" font-size="16" font-weight="600" fill="#2c2620">needs a</text>
+  <text x="410" y="256" text-anchor="middle" font-size="16" font-weight="600" fill="#2c2620">tool?</text>
+
+  <!-- yes branch -> middleware runs it -->
+  <line x1="476" y1="228" x2="556" y2="208" stroke="#6b6255" stroke-width="2.5" marker-end="url(#tl-arrow)" />
+  <text x="500" y="200" text-anchor="middle" font-size="15" font-weight="600" fill="#7c2e39">yes</text>
+
+  <rect x="560" y="150" width="270" height="110" rx="14" fill="#fdfbf3" stroke="#2c2620" stroke-width="2.5" />
+  <text x="695" y="192" text-anchor="middle" font-size="19" font-weight="600" fill="#2c2620">emit tool call →</text>
+  <text x="695" y="222" text-anchor="middle" font-size="16" fill="#6b6255">middleware runs the</text>
+  <text x="695" y="243" text-anchor="middle" font-size="16" fill="#6b6255">real backend call</text>
+
+  <!-- loop back to model -->
+  <path d="M 695 150 C 695 45, 145 40, 145 176" fill="none" stroke="#6b6255" stroke-width="2.5" stroke-dasharray="7 6" marker-end="url(#tl-arrow)" />
+  <text x="420" y="58" text-anchor="middle" font-size="17" font-style="italic" fill="#6b6255">result fed back to the model — loops until it's done</text>
+
+  <!-- no branch -> final reply -->
+  <line x1="410" y1="302" x2="410" y2="348" stroke="#6b6255" stroke-width="2.5" marker-end="url(#tl-arrow)" />
+  <text x="432" y="330" text-anchor="middle" font-size="15" font-weight="600" fill="#7c2e39">no</text>
+
+  <rect x="280" y="350" width="260" height="96" rx="14" fill="#7c2e39" />
+  <text x="410" y="392" text-anchor="middle" font-size="20" font-weight="600" fill="#fdfbf3">final reply</text>
+  <text x="410" y="420" text-anchor="middle" font-size="15" fill="#fdfbf3" opacity="0.85">to the student</text>
+</svg>

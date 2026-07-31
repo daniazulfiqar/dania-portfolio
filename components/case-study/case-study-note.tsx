@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 import type { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -38,8 +39,13 @@ function ImagePlaceholder({ caption }: { caption?: string }) {
 
 // maps every markdown node to the site's paper/ink theme. headings take the
 // wax accent (like the rest of the site), tables scroll on narrow screens,
-// and images become captioned placeholders.
-const components: Components = {
+// and images become captioned placeholders. built as a factory so links to
+// another case study (href "#cs-<slug>") can call back into the page and swap
+// the open study in place instead of opening a new tab.
+function makeComponents(
+  onOpenStudy?: (slug: string) => void,
+): Components {
+  return {
   h1: ({ children }) => (
     <h2 className="mb-4 mt-14 font-heading text-2xl font-semibold text-wax">
       {children}
@@ -71,26 +77,48 @@ const components: Components = {
     );
   },
   ul: ({ children }) => (
-    <ul className="my-4 flex list-disc flex-col gap-2 pl-5 font-body leading-relaxed text-ink-soft marker:text-ink/30">
+    <ul className="my-4 flex list-disc flex-col gap-2.5 pl-5 font-body leading-relaxed text-ink-soft marker:text-ink/30">
       {children}
     </ul>
   ),
   ol: ({ children }) => (
-    <ol className="my-4 flex list-decimal flex-col gap-2 pl-5 font-body leading-relaxed text-ink-soft marker:text-ink/40">
+    <ol className="my-4 flex list-decimal flex-col gap-2.5 pl-5 font-body leading-relaxed text-ink-soft marker:text-ink/40">
       {children}
     </ol>
   ),
-  li: ({ children }) => <li className="pl-1">{children}</li>,
-  a: ({ href, children }) => (
-    <a
-      href={href}
-      target="_blank"
-      rel="noreferrer"
-      className="text-wax underline underline-offset-2 hover:text-wax/80"
-    >
-      {children}
-    </a>
+  // `[&>p]:my-0` collapses the paragraph markdown wraps around a "loose" list
+  // item (one with blank lines between items) — without it every bullet piled
+  // on a full paragraph's margin and the list read as huge gaps. nested lists
+  // get a small, even inset instead of the top-level `my-4`.
+  li: ({ children }) => (
+    <li className="pl-1 [&>ol]:my-1.5 [&>p]:my-0 [&>ul]:my-1.5">{children}</li>
   ),
+  a: ({ href, children }) => {
+    // a "#cs-<slug>" link points at another case study; intercept it and swap
+    // the open note in place rather than navigating away.
+    if (href?.startsWith("#cs-")) {
+      const slug = href.slice(4);
+      return (
+        <button
+          type="button"
+          onClick={() => onOpenStudy?.(slug)}
+          className="font-body text-wax underline underline-offset-2 hover:text-wax/80"
+        >
+          {children}
+        </button>
+      );
+    }
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noreferrer"
+        className="text-wax underline underline-offset-2 hover:text-wax/80"
+      >
+        {children}
+      </a>
+    );
+  },
   strong: ({ children }) => (
     <strong className="font-semibold text-ink">{children}</strong>
   ),
@@ -101,9 +129,60 @@ const components: Components = {
     </blockquote>
   ),
   hr: () => <hr className="my-12 border-ink/10" />,
-  img: ({ alt }) => <ImagePlaceholder caption={alt || undefined} />,
+  img: ({ src, alt }) => {
+    // author notes with no real asset yet come through as "#placeholder" (see
+    // lib/case-study-content.ts) — show the dashed stand-in for those. anything
+    // with a real path renders as a captioned figure, matted on a white card so
+    // transparent diagrams read cleanly on the coloured note.
+    if (!src || typeof src !== "string" || src === "#placeholder") {
+      return <ImagePlaceholder caption={alt || undefined} />;
+    }
+    // our hand-drawn svg diagrams have transparent backgrounds; they sit on the
+    // same graph-paper as the work cards so the two read as one family. raster
+    // screenshots keep a plain white mat (a photo on graph paper looks odd).
+    const isDiagram = src.split("?")[0].endsWith(".svg");
+    // alt text may carry a "heading | caption" pair: the heading is a small
+    // label above the figure, the caption sits below it. a plain alt with no
+    // " | " is treated as caption-only.
+    const [rawHeading, ...captionParts] = (alt || "").split(" | ");
+    const hasHeading = captionParts.length > 0;
+    const heading = hasHeading ? rawHeading : "";
+    const caption = hasHeading ? captionParts.join(" | ") : alt;
+    return (
+      <span className="my-8 flex flex-col items-center gap-3">
+        {heading && (
+          <span className="font-heading text-sm font-semibold lowercase tracking-tight text-ink">
+            {heading}
+          </span>
+        )}
+        <span
+          className={`w-full overflow-hidden rounded-lg border border-ink/10 shadow-sm ${
+            isDiagram ? "p-4 sm:p-6" : "bg-white p-2 sm:p-3"
+          }`}
+          style={
+            isDiagram
+              ? {
+                  backgroundColor: "#f3f5f8",
+                  backgroundImage:
+                    "linear-gradient(#e0e5ec 1px, transparent 1px), linear-gradient(90deg, #e0e5ec 1px, transparent 1px)",
+                  backgroundSize: "13px 13px",
+                }
+              : undefined
+          }
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={src} alt={caption || ""} loading="lazy" className="w-full rounded" />
+        </span>
+        {caption && (
+          <span className="max-w-xl text-center font-body text-xs leading-relaxed text-ink-soft">
+            {caption}
+          </span>
+        )}
+      </span>
+    );
+  },
   code: ({ children }) => (
-    <code className="rounded bg-ink/[0.06] px-1.5 py-0.5 font-mono text-[0.85em] text-ink">
+    <code className="whitespace-nowrap rounded bg-ink/[0.06] px-1.5 py-0.5 font-mono text-[0.85em] text-ink">
       {children}
     </code>
   ),
@@ -125,7 +204,8 @@ const components: Components = {
       {children}
     </td>
   ),
-};
+  };
+}
 
 // the interior of a case-study sticky note: the header (label, title, summary,
 // tags) and either the rendered markdown or the "still writing this" draft
@@ -136,12 +216,16 @@ export function CaseStudyNoteBody({
   summary,
   tags,
   markdown,
+  onOpenStudy,
 }: {
   title: string;
   summary?: string;
   tags?: string[];
   markdown: string | null;
+  onOpenStudy?: (slug: string) => void;
 }) {
+  const components = useMemo(() => makeComponents(onOpenStudy), [onOpenStudy]);
+
   // no markdown on disk yet → this study is still a draft.
   if (!markdown) {
     return (
@@ -187,8 +271,14 @@ export function CaseStudyNoteBody({
         )}
       </header>
 
-      <div className="mt-12 border-t border-ink/10 pt-10">
-        <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+      <div className="mt-12 border-t border-ink/10 pt-10 [&>*:first-child]:mt-0">
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          components={components}
+          // the markdown is our own trusted content; keep hrefs verbatim so the
+          // "#cs-<slug>" cross-study links reach the link renderer intact.
+          urlTransform={(url) => url}
+        >
           {markdown}
         </ReactMarkdown>
       </div>

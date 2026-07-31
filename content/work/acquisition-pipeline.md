@@ -27,7 +27,7 @@ Maqsad runs student acquisition on WhatsApp. A student taps a Meta or Google ad,
 
 | Agent | Job | How it works |
 |---|---|---|
-| **1 · Sales bot** | Talks to every student, runs them through qualifying questions | Conversational agent, not a menu tree. Full build in its own case study. |
+| **1 · Sales bot** | Talks to every student, runs them through qualifying questions | Conversational agent, not a menu tree. [Read the full build →](#cs-student-counsellor) |
 | **2 · Classifier** | Reads the finished conversation and buckets it by intent | Python plus an LLM on Claude Code, reading chats from the Chatwoot API |
 | **3 · Campaign analyser** | Tells me which campaigns and creatives are worth the spend | Sits on the Meta API, joins lead quality back to the exact creative |
 
@@ -38,14 +38,14 @@ Maqsad runs student acquisition on WhatsApp. A student taps a Meta or Google ad,
 - That firing hands the lead to sales: a function drops it into a Slack channel and tags the rep who should call.
 - Every chat carries the Meta ad ID that brought it. That's the join. Lead quality flows back to the exact creative, and the analyser uses it to move spend. That's the loop closing.
 
-[ three-agent pipeline diagram goes here ]
+![the three-agent pipeline | a student taps an ad into whatsapp, the sales bot qualifies, the classifier buckets by intent and hands qualified leads to a rep via slack, and the campaign analyser joins lead quality back to the exact creative to move ad spend](/images/work/pipeline/three-agent-pipeline.svg)
 
 ### Why build agents
 
 - The signal lives in how students talk, not in keywords. You can't regex your way from "sir class timings kya hain" to a student who's ready to pay.
 - Students write in a mix of English and Roman Urdu, and most don't use a real name on WhatsApp.
 - I needed something that reads a full conversation the way a rep would, at a volume no team can handle.
-- The sales bot is the same problem from the other side. It holds a real conversation instead of walking a menu. Full build in its own case study.
+- The sales bot is the same problem from the other side. It holds a real conversation instead of walking a menu — [read more about it in the student-counsellor case study →](#cs-student-counsellor).
 
 ### How I defined a good output
 

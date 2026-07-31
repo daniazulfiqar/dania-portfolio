@@ -4,8 +4,6 @@ maqsad's admissions counsellor for stressed-out exam students. it guides them th
 
 llm agent · tool calling · student psychology
 
----
-
 ## summary
 
 - students reach us on whatsapp faster than a small sales team can answer, at all hours, with high-stakes questions
@@ -65,7 +63,7 @@ the path a message takes:
 - to the sonnet 5 agent on aws
 - and the reply back the same way
 
-![how a message travels | whatsapp → chatwoot + typebot → our middleware → the sonnet 5 agent on aws, and the reply back the same way](/images/work/counsellor/message-flow.svg)
+> [diagram: keep your message-path diagram here]
 
 the important bit:
 
@@ -74,7 +72,7 @@ the important bit:
 - the middleware runs the real backend call and feeds the result back to the model
 - the model loops until it has a final reply. i own that loop
 
-![the tool-use loop | the model asks for a tool, the middleware runs the real backend call and feeds the result back, looping until there's a final reply](/images/work/counsellor/tool-loop.svg)
+> [diagram: keep your tool-use loop diagram here]
 
 - this is also why the bot never asks a student for their phone number. the middleware pulls it from the chatwoot conversation and injects it as context. the model already knows who it's talking to
 
@@ -108,11 +106,9 @@ the agent has 9 tools. two groups: the ones that run in a fixed sequence at the 
 | `assign-agent` | hands off to a human, routes to the right exam's counsellor, or unassigns the bot | escalation, routing, or an irrelevant lead |
 | `update-contact` | writes a confirmed phone number back onto the chatwoot contact | when the number needs correcting at source |
 
+> [diagram or screenshot: pair these two together, the tool-definitions list and the create-new-tool modal, so the reader sees the full list and how one is built]
+
 each tool is a real, configured definition: a description the model reads, an implementation key that maps to a backend action, and a json schema for its inputs.
-
-![the tool definitions | 9 real tools, each with a description and an implementation key that maps to a backend action](/images/work/counsellor/tools-table.jpg)
-
-![editing a tool | its description, implementation key, and the json schema describing its inputs](/images/work/counsellor/tool-schema.jpg)
 
 a few are worth the story, because they're where the product thinking is.
 
@@ -134,9 +130,12 @@ everything specific the bot says about you comes from a live call mid-conversati
 
 ### `assign-agent` does three jobs
 
-![assign-agent's three jobs | hand a chat to a human when the bot is out of its depth, route a student to the right exam's counsellor, or unassign the bot on an irrelevant lead so it goes quiet and stops burning tokens](/images/work/counsellor/assign-agent.svg)
+- **handoff when the bot is out of its depth.** some questions are just better answered by a person. the model recognises that and passes the chat over
+- **routing to the right counsellor.** each exam has its own agent. an ECAT student who lands in the MDCAT counsellor gets handed to the ECAT one. the agents pass students between each other
+- **unassigning irrelevant leads to stop burning tokens.** performance campaigns pull in a lot of junk. every junk lead the bot keeps replying to costs money. when it recognises an irrelevant chat, it marks it, unassigns itself (agent id 0 = none), and goes quiet. that one change took real cost off the table
 
-under the hood it takes a chatwoot agent id, and each id is a real human or desk — so when the model calls it, chatwoot reassigns the conversation, the bot goes silent, and a person owns it from there. that third job, dropping irrelevant chats, is the "knowing when to stop" bar in code: the bot deciding when it shouldn't be the one talking.
+- under the hood, `assign-agent` takes a chatwoot agent id, and each id is a real human or desk. when the model calls it, chatwoot reassigns the conversation, the bot goes silent, and a person owns it from there
+- this tool is the "knowing when to stop" bar in code: the bot deciding when it shouldn't be the one talking, and handing off or dropping the chat instead of pushing
 
 ### `assign-label` gives the sales team a head start
 
@@ -163,7 +162,7 @@ on top of that:
 
 - a verified-facts foundation pins the things students most often get wrong. the exam is 180 marks, full stop. it never calculates merit, it sends them to the official calculator. anything it isn't sure of, it flags as best confirmed on the official page
 
-![the counsellor's system prompt | the INIT sequence that runs on every conversation, and the NO FABRICATION hard rule at the top](/images/work/counsellor/instructions-box.jpg)
+> [diagram or screenshot: keep the system-prompt view showing the INIT sequence and the NO FABRICATION rule]
 
 ## how the system evolved
 
@@ -183,22 +182,20 @@ it also drew a line i now think is right:
 - the knowledge base holds facts: dates, patterns, merits, batch details
 - behaviour and facts change on different clocks, so keeping them apart means i can edit one without disturbing the other
 
-![prompt → knowledge base | before, everything was crammed into one prompt; after, behaviour stays in the prompt and the facts move into a knowledge base with file search](/images/work/counsellor/kb-before-after.svg)
+> [diagram: your before/after split is a clean visual. one side "everything in the prompt," other side "behaviour in prompt, facts in knowledge base"]
 
-### why we built our own assistants platform
+### why the assistants platform is ours, not a vendor's
 
-the platform i keep mentioning wasn't the original plan. here's how we ended up building it.
+the platform i've been referencing throughout this wasn't the original plan. here's how we ended up building it.
 
-- we started on openai's assistants playground. the interface was already there, so we plugged in our functions and prompt and moved fast
-- then openai deprecated the assistants api and pushed everyone onto the new responses api
-- for us that wasn't a quick swap. our whole crm ran on typebot and chatwoot, the middleware was built around that flow, and the sales team lived in it every day. moving meant re-plumbing all of it and retraining the team
+- we started on the openai assistants playground. the interface was already built, so we just added our functions and prompt, and it let us move fast early
+- then openai deprecated the assistants api (announced august 2025, shutting down august 2026) and pushed everyone to the responses api
+- migrating was a real problem for us. our whole CRM was wired to typebot and chatwoot, our middleware was built around that flow, and the sales team worked inside it every day. moving would have meant re-plumbing all of it and retraining the team
 
-so rather than rebuild everything onto openai's new api — and be exposed to the next deprecation whenever it came — we built our own assistants platform in-house.
+so instead of migrating onto someone else's new api, i built our own in-house assistants platform.
 
-- it kept everything we relied on: file search, tools, instructions
-- and it gave us something the playground never did: a different model per assistant
-
-![the assistants platform we built | each counsellor is its own assistant, here MDCAT on claude sonnet 5, with instructions, knowledge, and tools tabs](/images/work/counsellor/config-page.jpg)
+- it kept every piece we relied on: file search, tools, instructions
+- and it added the thing the playground never gave us: a different model per assistant
 
 that model-per-assistant part is where it pays off.
 
@@ -206,7 +203,7 @@ that model-per-assistant part is where it pays off.
 - a heavy exam like MDCAT or ECAT, with all its dates and merits and nuance, runs a stronger model like sonnet or opus
 - we route the model to the difficulty of the job
 
-![a model per exam | simpler exams route to a lighter model like haiku, complex ones like mdcat and ecat to a stronger one like sonnet or opus](/images/work/counsellor/model-routing.svg)
+> [diagram or screenshot: the assistants platform, one place, a model picker per exam]
 
 what we got out of building it:
 
@@ -225,7 +222,7 @@ the eval loop:
 - i own the counsellor's job as one number: the share of conversations that land in qualified
 - if the bot is counselling well, more students come out qualified. if that share moves, the bot's behaviour moved
 
-![the eval loop | every finished chat goes to a classifier agent that sorts it into a bucket; the share landing in "qualified" is the counsellor's report card, and a drop sends me back to the transcripts](/images/work/counsellor/eval-loop.svg)
+> [diagram: the eval loop as a cycle. chat to classifier to bucket to qualified-rate to me reading transcripts and back. this one really wants a picture]
 
 - that gives me a daily read on quality without reading a single transcript
 - detection, then diagnosis:
@@ -234,7 +231,7 @@ the eval loop:
   - the number is the smoke alarm, the transcripts are where i find the fire
 
 - the full bucket taxonomy, and how these scores drive ad spend, is its own system:
-  - covered in the [acquisition-pipeline case study →](#cs-acquisition-pipeline)
+  - covered in the acquisition-pipeline case study
   - here i'm using the classifier for one thing: the counsellor's report card
 
 ## where it failed and what i changed
@@ -268,7 +265,7 @@ fixing those left me with a few tensions i couldn't fully design away.
 
 the outcome it feeds into:
 
-- **conversion: 2% to 10%.** that's the whole [acquisition system](#cs-acquisition-pipeline) moving (ad targeting, lead scoring, and the counsellor together), not the bot alone
+- **conversion: 2% to 10%.** that's the whole acquisition system moving (ad targeting, lead scoring, and the counsellor together), not the bot alone
 - the counsellor's clean contribution to it is the qualified-rate above. i'd rather own that number than claim one i share
 
 ## what i'd improve next

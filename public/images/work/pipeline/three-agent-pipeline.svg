@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 59 976 399" font-family="Poppins, ui-sans-serif, system-ui, sans-serif">
+  <defs>
+    <marker id="ap-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#6b6255" />
+    </marker>
+  </defs>
+
+  <!-- entry -->
+  <rect x="24" y="100" width="190" height="120" rx="14" fill="#fdfbf3" stroke="#2c2620" stroke-width="2.5" />
+  <text x="119" y="150" text-anchor="middle" font-size="17" font-weight="600" fill="#2c2620">taps an ad</text>
+  <text x="119" y="178" text-anchor="middle" font-size="15" fill="#6b6255">lands in</text>
+  <text x="119" y="199" text-anchor="middle" font-size="15" fill="#6b6255">whatsapp</text>
+
+  <line x1="214" y1="160" x2="258" y2="160" stroke="#6b6255" stroke-width="2.5" marker-end="url(#ap-arrow)" />
+
+  <!-- 1 sales bot -->
+  <rect x="262" y="100" width="190" height="120" rx="14" fill="#fdfbf3" stroke="#c08a2d" stroke-width="3" />
+  <circle cx="286" cy="100" r="17" fill="#7c2e39" />
+  <text x="286" y="106" text-anchor="middle" font-size="17" font-weight="700" fill="#fdfbf3">1</text>
+  <text x="357" y="152" text-anchor="middle" font-size="18" font-weight="600" fill="#2c2620">sales bot</text>
+  <text x="357" y="180" text-anchor="middle" font-size="15" fill="#6b6255">talks first,</text>
+  <text x="357" y="201" text-anchor="middle" font-size="15" fill="#6b6255">qualifies</text>
+
+  <line x1="452" y1="160" x2="496" y2="160" stroke="#6b6255" stroke-width="2.5" marker-end="url(#ap-arrow)" />
+
+  <!-- 2 classifier -->
+  <rect x="500" y="100" width="190" height="120" rx="14" fill="#fdfbf3" stroke="#c08a2d" stroke-width="3" />
+  <circle cx="524" cy="100" r="17" fill="#7c2e39" />
+  <text x="524" y="106" text-anchor="middle" font-size="17" font-weight="700" fill="#fdfbf3">2</text>
+  <text x="595" y="152" text-anchor="middle" font-size="18" font-weight="600" fill="#2c2620">classifier</text>
+  <text x="595" y="180" text-anchor="middle" font-size="15" fill="#6b6255">reads the chat,</text>
+  <text x="595" y="201" text-anchor="middle" font-size="15" fill="#6b6255">buckets by intent</text>
+
+  <line x1="690" y1="160" x2="734" y2="160" stroke="#6b6255" stroke-width="2.5" marker-end="url(#ap-arrow)" />
+
+  <!-- outcome -->
+  <rect x="738" y="100" width="214" height="120" rx="14" fill="#7c2e39" />
+  <text x="845" y="148" text-anchor="middle" font-size="18" font-weight="600" fill="#fdfbf3">qualified lead</text>
+  <text x="845" y="178" text-anchor="middle" font-size="15" fill="#fdfbf3" opacity="0.9">→ slack →</text>
+  <text x="845" y="199" text-anchor="middle" font-size="15" fill="#fdfbf3" opacity="0.9">the rep calls</text>
+
+  <!-- classifier -> analyser (lead quality) -->
+  <line x1="595" y1="220" x2="595" y2="312" stroke="#6b6255" stroke-width="2.5" marker-end="url(#ap-arrow)" />
+  <text x="610" y="270" font-size="15" font-style="italic" fill="#6b6255">lead quality</text>
+
+  <!-- 3 campaign analyser -->
+  <rect x="470" y="314" width="290" height="120" rx="14" fill="#fdfbf3" stroke="#c08a2d" stroke-width="3" />
+  <circle cx="494" cy="314" r="17" fill="#7c2e39" />
+  <text x="494" y="320" text-anchor="middle" font-size="17" font-weight="700" fill="#fdfbf3">3</text>
+  <text x="615" y="360" text-anchor="middle" font-size="18" font-weight="600" fill="#2c2620">campaign analyser</text>
+  <text x="615" y="388" text-anchor="middle" font-size="15" fill="#6b6255">joins lead quality to the exact</text>
+  <text x="615" y="409" text-anchor="middle" font-size="15" fill="#6b6255">creative (via the meta ad id)</text>
+
+  <!-- analyser -> back to the ad (spend loop) -->
+  <path d="M 470 374 L 119 374 L 119 222" fill="none" stroke="#6b6255" stroke-width="2.5" stroke-dasharray="7 6" marker-end="url(#ap-arrow)" />
+  <text x="285" y="398" text-anchor="middle" font-size="15" font-style="italic" fill="#6b6255">moves spend to the creatives that bring good leads</text>
+</svg>

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="6 2 888 410" font-family="Poppins, ui-sans-serif, system-ui, sans-serif">
+  <defs>
+    <marker id="aa-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#6b6255" />
+    </marker>
+  </defs>
+
+  <!-- assign-agent (accent) -->
+  <rect x="30" y="160" width="210" height="110" rx="14" fill="#fdfbf3" stroke="#c08a2d" stroke-width="3" />
+  <text x="135" y="210" text-anchor="middle" font-size="21" font-weight="600" fill="#2c2620">assign-agent</text>
+  <text x="135" y="240" text-anchor="middle" font-size="14" fill="#6b6255">one tool, three jobs</text>
+
+  <!-- fan-out arrows -->
+  <path d="M 240 215 L 426 86" fill="none" stroke="#6b6255" stroke-width="2.5" marker-end="url(#aa-arrow)" />
+  <path d="M 240 215 L 426 215" fill="none" stroke="#6b6255" stroke-width="2.5" marker-end="url(#aa-arrow)" />
+  <path d="M 240 215 L 426 344" fill="none" stroke="#6b6255" stroke-width="2.5" marker-end="url(#aa-arrow)" />
+
+  <!-- 1: handoff -->
+  <rect x="430" y="42" width="440" height="88" rx="12" fill="#fdfbf3" stroke="#2c2620" stroke-width="2" />
+  <circle cx="454" cy="42" r="16" fill="#7c2e39" />
+  <text x="454" y="48" text-anchor="middle" font-size="15" font-weight="700" fill="#fdfbf3">1</text>
+  <text x="462" y="80" font-size="18" font-weight="600" fill="#2c2620">hand off to a human</text>
+  <text x="462" y="106" font-size="14" fill="#6b6255">when the bot is out of its depth</text>
+
+  <!-- 2: routing -->
+  <rect x="430" y="171" width="440" height="88" rx="12" fill="#fdfbf3" stroke="#2c2620" stroke-width="2" />
+  <circle cx="454" cy="171" r="16" fill="#7c2e39" />
+  <text x="454" y="177" text-anchor="middle" font-size="15" font-weight="700" fill="#fdfbf3">2</text>
+  <text x="462" y="209" font-size="18" font-weight="600" fill="#2c2620">route to the right counsellor</text>
+  <text x="462" y="235" font-size="14" fill="#6b6255">an ecat student in the mdcat bot → the ecat one</text>
+
+  <!-- 3: unassign (highlight) -->
+  <rect x="430" y="300" width="440" height="88" rx="12" fill="#fdfbf3" stroke="#7c2e39" stroke-width="2.5" />
+  <circle cx="454" cy="300" r="16" fill="#7c2e39" />
+  <text x="454" y="306" text-anchor="middle" font-size="15" font-weight="700" fill="#fdfbf3">3</text>
+  <text x="462" y="338" font-size="18" font-weight="600" fill="#2c2620">unassign the bot (agent id 0)</text>
+  <text x="462" y="364" font-size="14" fill="#6b6255">irrelevant lead → it goes quiet, stops burning tokens</text>
+</svg>

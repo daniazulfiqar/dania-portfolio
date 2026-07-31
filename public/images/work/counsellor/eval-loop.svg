@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="16 48 1146 446" font-family="Poppins, ui-sans-serif, system-ui, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#6b6255" />
+    </marker>
+    <marker id="arrowWax" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#7c2e39" />
+    </marker>
+  </defs>
+
+  <!-- 1. finished conversation -->
+  <rect x="40" y="200" width="230" height="130" rx="14" fill="#fdfbf3" stroke="#2c2620" stroke-width="2.5" />
+  <text x="155" y="250" text-anchor="middle" font-size="26" font-weight="600" fill="#2c2620">finished chat</text>
+  <text x="155" y="284" text-anchor="middle" font-size="17" fill="#6b6255">both sides of the</text>
+  <text x="155" y="308" text-anchor="middle" font-size="17" fill="#6b6255">chatwoot transcript</text>
+
+  <!-- arrow 1 -->
+  <line x1="278" y1="265" x2="352" y2="265" stroke="#6b6255" stroke-width="2.5" marker-end="url(#arrow)" />
+
+  <!-- 2. classifier agent -->
+  <rect x="360" y="192" width="250" height="146" rx="14" fill="#fdfbf3" stroke="#c08a2d" stroke-width="3" />
+  <text x="485" y="242" text-anchor="middle" font-size="26" font-weight="600" fill="#2c2620">classifier agent</text>
+  <text x="485" y="276" text-anchor="middle" font-size="17" fill="#6b6255">reads every chat,</text>
+  <text x="485" y="300" text-anchor="middle" font-size="17" fill="#6b6255">once a day, and</text>
+  <text x="485" y="324" text-anchor="middle" font-size="17" fill="#6b6255">sorts it into a bucket</text>
+
+  <!-- arrow 2 -->
+  <line x1="618" y1="265" x2="692" y2="265" stroke="#6b6255" stroke-width="2.5" marker-end="url(#arrow)" />
+
+  <!-- 3. buckets -->
+  <rect x="700" y="150" width="230" height="230" rx="14" fill="none" stroke="#2c2620" stroke-width="1.5" stroke-dasharray="5 5" />
+  <!-- qualified (highlighted) -->
+  <rect x="720" y="168" width="190" height="46" rx="10" fill="#7c2e39" />
+  <text x="815" y="197" text-anchor="middle" font-size="19" font-weight="600" fill="#fdfbf3">qualified</text>
+  <!-- ghosted -->
+  <rect x="720" y="222" width="190" height="42" rx="10" fill="#fdfbf3" stroke="#2c2620" stroke-width="1.5" />
+  <text x="815" y="249" text-anchor="middle" font-size="18" fill="#6b6255">ghosted</text>
+  <!-- irrelevant -->
+  <rect x="720" y="272" width="190" height="42" rx="10" fill="#fdfbf3" stroke="#2c2620" stroke-width="1.5" />
+  <text x="815" y="299" text-anchor="middle" font-size="18" fill="#6b6255">irrelevant</text>
+  <!-- future prospect -->
+  <rect x="720" y="322" width="190" height="42" rx="10" fill="#fdfbf3" stroke="#2c2620" stroke-width="1.5" />
+  <text x="815" y="349" text-anchor="middle" font-size="18" fill="#6b6255">future prospect</text>
+
+  <!-- arrow 3: qualified -> metric -->
+  <line x1="912" y1="191" x2="985" y2="150" stroke="#7c2e39" stroke-width="2.5" marker-end="url(#arrowWax)" />
+
+  <!-- 4. the metric -->
+  <rect x="988" y="72" width="150" height="120" rx="14" fill="#7c2e39" />
+  <text x="1063" y="118" text-anchor="middle" font-size="22" font-weight="700" fill="#fdfbf3">qualified</text>
+  <text x="1063" y="146" text-anchor="middle" font-size="22" font-weight="700" fill="#fdfbf3">rate</text>
+  <text x="1063" y="174" text-anchor="middle" font-size="14" fill="#fdfbf3" opacity="0.85">the report card</text>
+
+  <!-- feedback loop: metric -> back to finished chat -->
+  <path d="M 1063 196 L 1063 470 L 155 470 L 155 336" fill="none" stroke="#6b6255" stroke-width="2.5" stroke-dasharray="7 6" marker-end="url(#arrow)" />
+  <text x="609" y="458" text-anchor="middle" font-size="18" font-style="italic" fill="#6b6255">if the rate drops → go read the transcripts to find out why</text>
+</svg>

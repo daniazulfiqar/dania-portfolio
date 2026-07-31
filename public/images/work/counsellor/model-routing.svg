@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="10 84 908 274" font-family="Poppins, ui-sans-serif, system-ui, sans-serif">
+  <defs>
+    <marker id="mr-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#6b6255" />
+    </marker>
+  </defs>
+
+  <!-- murshid platform (accent) -->
+  <rect x="34" y="140" width="226" height="140" rx="14" fill="#fdfbf3" stroke="#c08a2d" stroke-width="3" />
+  <text x="147" y="190" text-anchor="middle" font-size="24" font-weight="600" fill="#2c2620">murshid</text>
+  <text x="147" y="220" text-anchor="middle" font-size="15" fill="#6b6255">the platform i built —</text>
+  <text x="147" y="242" text-anchor="middle" font-size="15" fill="#6b6255">picks a model</text>
+  <text x="147" y="264" text-anchor="middle" font-size="15" fill="#6b6255">per exam</text>
+
+  <!-- branch arrows -->
+  <path d="M 260 185 L 372 150" fill="none" stroke="#6b6255" stroke-width="2.5" marker-end="url(#mr-arrow)" />
+  <path d="M 260 240 L 372 288" fill="none" stroke="#6b6255" stroke-width="2.5" marker-end="url(#mr-arrow)" />
+
+  <!-- row 1: simpler exams -> lighter model -->
+  <rect x="376" y="112" width="212" height="76" rx="12" fill="#fdfbf3" stroke="#2c2620" stroke-width="2" />
+  <text x="482" y="147" text-anchor="middle" font-size="18" font-weight="600" fill="#2c2620">simpler exams</text>
+  <text x="482" y="171" text-anchor="middle" font-size="14" fill="#6b6255">lower nuance</text>
+
+  <line x1="588" y1="150" x2="654" y2="150" stroke="#6b6255" stroke-width="2.5" marker-end="url(#mr-arrow)" />
+
+  <rect x="658" y="108" width="236" height="86" rx="12" fill="#fdfbf3" stroke="#2c2620" stroke-width="2" />
+  <text x="776" y="145" text-anchor="middle" font-size="20" font-weight="600" fill="#2c2620">haiku</text>
+  <text x="776" y="171" text-anchor="middle" font-size="14" fill="#6b6255">lighter + cheaper</text>
+
+  <!-- row 2: complex exams -> stronger model -->
+  <rect x="376" y="250" width="212" height="80" rx="12" fill="#fdfbf3" stroke="#2c2620" stroke-width="2" />
+  <text x="482" y="285" text-anchor="middle" font-size="18" font-weight="600" fill="#2c2620">mdcat · ecat</text>
+  <text x="482" y="309" text-anchor="middle" font-size="14" fill="#6b6255">dates, merits, nuance</text>
+
+  <line x1="588" y1="290" x2="654" y2="290" stroke="#6b6255" stroke-width="2.5" marker-end="url(#mr-arrow)" />
+
+  <rect x="658" y="246" width="236" height="88" rx="12" fill="#fdfbf3" stroke="#7c2e39" stroke-width="2.5" />
+  <text x="776" y="284" text-anchor="middle" font-size="19" font-weight="600" fill="#7c2e39">sonnet / opus</text>
+  <text x="776" y="310" text-anchor="middle" font-size="14" fill="#6b6255">more firepower</text>
+</svg>

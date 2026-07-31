@@ -440,6 +440,16 @@ export function ProjectsFold({ studies }: { studies: StudyContent }) {
     [studies],
   );
 
+  // a case study can link to another one (a "#cs-<slug>" link in its markdown);
+  // resolve the slug to its card and swap the open note to it in place.
+  const openStudyBySlug = useCallback(
+    (slug: string) => {
+      const project = goodOnes.find((p) => p.id === slug);
+      if (project) openCard(project);
+    },
+    [openCard],
+  );
+
   // the fold's entrance is driven imperatively so it plays exactly when we
   // want and no more: once when it first scrolls into view (and then stays put
   // — scrolling back up never hides or replays it), plus an explicit replay
@@ -656,7 +666,11 @@ export function ProjectsFold({ studies }: { studies: StudyContent }) {
         </motion.ul>
       </div>
 
-      <CaseStudyModal study={openStudy} onClose={() => setOpenStudy(null)} />
+      <CaseStudyModal
+        study={openStudy}
+        onClose={() => setOpenStudy(null)}
+        onOpenStudy={openStudyBySlug}
+      />
     </section>
   );
 }

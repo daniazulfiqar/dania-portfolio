@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 84 1125 300" font-family="Poppins, ui-sans-serif, system-ui, sans-serif">
+  <defs>
+    <marker id="mf-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#6b6255" />
+    </marker>
+  </defs>
+
+  <!-- main inbound row -->
+  <!-- 1. student on whatsapp -->
+  <rect x="24" y="120" width="176" height="120" rx="14" fill="#fdfbf3" stroke="#2c2620" stroke-width="2.5" />
+  <text x="112" y="170" text-anchor="middle" font-size="22" font-weight="600" fill="#2c2620">student</text>
+  <text x="112" y="200" text-anchor="middle" font-size="16" fill="#6b6255">on whatsapp</text>
+
+  <line x1="204" y1="180" x2="250" y2="180" stroke="#6b6255" stroke-width="2.5" marker-end="url(#mf-arrow)" />
+
+  <!-- 2. chatwoot -->
+  <rect x="254" y="120" width="176" height="120" rx="14" fill="#fdfbf3" stroke="#2c2620" stroke-width="2.5" />
+  <text x="342" y="170" text-anchor="middle" font-size="22" font-weight="600" fill="#2c2620">chatwoot</text>
+  <text x="342" y="200" text-anchor="middle" font-size="16" fill="#6b6255">+ typebot</text>
+
+  <line x1="434" y1="180" x2="480" y2="180" stroke="#6b6255" stroke-width="2.5" marker-end="url(#mf-arrow)" />
+
+  <!-- 3. middleware (the hub) -->
+  <rect x="484" y="108" width="200" height="144" rx="14" fill="#fdfbf3" stroke="#c08a2d" stroke-width="3" />
+  <text x="584" y="152" text-anchor="middle" font-size="22" font-weight="600" fill="#2c2620">our middleware</text>
+  <text x="584" y="182" text-anchor="middle" font-size="15" fill="#6b6255">injects the phone #,</text>
+  <text x="584" y="204" text-anchor="middle" font-size="15" fill="#6b6255">owns the tool-use loop</text>
+  <text x="584" y="226" text-anchor="middle" font-size="15" fill="#6b6255">— i own this</text>
+
+  <!-- bidirectional loop between middleware and model -->
+  <line x1="688" y1="180" x2="734" y2="180" stroke="#6b6255" stroke-width="2.5" marker-start="url(#mf-arrow)" marker-end="url(#mf-arrow)" />
+
+  <!-- 4. the model -->
+  <rect x="738" y="120" width="200" height="120" rx="14" fill="#fdfbf3" stroke="#2c2620" stroke-width="2.5" />
+  <text x="838" y="164" text-anchor="middle" font-size="21" font-weight="600" fill="#2c2620">sonnet 5 agent</text>
+  <text x="838" y="196" text-anchor="middle" font-size="16" fill="#6b6255">reasons + decides</text>
+  <text x="838" y="218" text-anchor="middle" font-size="16" fill="#6b6255">on AWS</text>
+
+  <!-- note: model never touches whatsapp/db directly -->
+  <text x="960" y="180" font-size="15" font-style="italic" fill="#6b6255">
+    <tspan x="962" dy="0">the model never</tspan>
+    <tspan x="962" dy="22">talks to whatsapp</tspan>
+    <tspan x="962" dy="22">or the db directly</tspan>
+  </text>
+
+  <!-- reply travels back to the student -->
+  <path d="M 584 252 L 584 360 L 112 360 L 112 240" fill="none" stroke="#6b6255" stroke-width="2.5" stroke-dasharray="7 6" marker-end="url(#mf-arrow)" />
+  <text x="348" y="350" text-anchor="middle" font-size="17" font-style="italic" fill="#6b6255">the reply travels back to the student</text>
+</svg>
