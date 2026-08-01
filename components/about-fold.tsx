@@ -2,7 +2,13 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValueEvent,
+  useReducedMotion,
+  useScroll,
+} from "framer-motion";
 
 // the section's heading. sits at the top of the right-hand column, above the
 // copy, and stays put while the chapters turn over beneath it. reveals a word
@@ -67,24 +73,34 @@ function AboutHeading({ started }: { started?: boolean }) {
 // zone and gets caught rather than skipping past.
 const ROOT_VH = 140;
 
+// the phone version is scroll-linked (not scroll-captured): the pane pins and
+// the scroll position picks the chapter. this is the total scroll runway; minus
+// the one pinned screen it leaves ~1.4 screens split across the three chapters,
+// so each is a roughly half-screen swipe to the next.
+const MOBILE_ROOT_VH = 240;
+
 const CHAPTER_LABELS = ["intro", "maqsad", "fountain"];
 
 // pinned scrollytelling is opt-in: it needs both a wide viewport (two columns
 // side by side) and no reduced-motion preference. everything renders stacked
 // on the server so hydration matches, then the pin switches on if it applies.
-function usePinnedLayout() {
+// three layouts: the desktop pinned scrollytelling (>=1024), the phone
+// scroll-linked version (<1024), and a stacked fallback for reduced-motion. the
+// server renders `stacked` (width 0) so hydration matches, then the client
+// switches to the right one.
+function useAboutMode(): "desktop" | "mobile" | "stacked" {
   const shouldReduceMotion = useReducedMotion();
-  const [isWide, setIsWide] = useState(false);
+  const [width, setWidth] = useState(0);
 
   useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1024px)");
-    const sync = () => setIsWide(mq.matches);
+    const sync = () => setWidth(window.innerWidth);
     sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
+    window.addEventListener("resize", sync);
+    return () => window.removeEventListener("resize", sync);
   }, []);
 
-  return isWide && !shouldReduceMotion;
+  if (shouldReduceMotion || width === 0) return "stacked";
+  return width >= 1024 ? "desktop" : "mobile";
 }
 
 /* ---------------------------------------------------------------- visuals */
@@ -92,16 +108,26 @@ function usePinnedLayout() {
 // the intro's polaroid — taped down and slightly off-square. `compact` is the
 // board treatment: narrower, so it can share the left column with the taped
 // logos as they pile on beside it.
-function Polaroid({ compact = false }: { compact?: boolean }) {
+function Polaroid({
+  compact = false,
+  mini = false,
+}: {
+  compact?: boolean;
+  mini?: boolean;
+}) {
+  // `mini` is the phone treatment: a small taped square that shares a compact
+  // board row with the logos.
+  const size = mini ? "w-28" : compact ? "w-64" : "mx-auto w-56 sm:w-64";
+  const pad = mini ? "p-2 pb-6" : "p-3 pb-10";
   return (
     <div
-      className={`relative rotate-[-3deg] bg-[#fdfbf3] p-3 pb-10 shadow-[0_14px_30px_-10px_rgba(44,38,32,0.55)] ring-1 ring-black/5 ${
-        compact ? "w-64" : "mx-auto w-56 sm:w-64"
-      }`}
+      className={`relative rotate-[-3deg] bg-[#fdfbf3] ${pad} shadow-[0_14px_30px_-10px_rgba(44,38,32,0.55)] ring-1 ring-black/5 ${size}`}
     >
       <span
         aria-hidden="true"
-        className="absolute -top-4 left-1/2 h-7 w-24 -translate-x-1/2 rotate-2 bg-ochre/25"
+        className={`absolute left-1/2 -translate-x-1/2 rotate-2 bg-ochre/25 ${
+          mini ? "-top-3 h-5 w-16" : "-top-4 h-7 w-24"
+        }`}
       />
       <div className="relative aspect-[4/5] w-full overflow-hidden">
         <Image
@@ -690,6 +716,117 @@ function PinnedChapters() {
   );
 }
 
+// the phone board: a small polaroid with the taped logos landing beside it as
+// the chapters advance — the same idea as the desktop scrapboard, sized down to
+// sit above the copy in a single column.
+function MobileBoard({ active }: { active: number }) {
+  return (
+    <div className="flex items-center justify-center gap-4">
+      <motion.div layout transition={BOARD_SPRING} className="cursor-pointer">
+        <Polaroid mini />
+      </motion.div>
+      <div className="relative flex flex-col items-start gap-3">
+        <AnimatePresence mode="popLayout">
+          {active >= 1 && (
+            <BoardScrap keyName="maqsad">
+              <TapedLogo logo={MAQSAD_LOGO} rotate={3} display={90} />
+            </BoardScrap>
+          )}
+          {active >= 2 && (
+            <BoardScrap keyName="fountain" className="ml-4">
+              <TapedLogo logo={FOUNTAIN_LOGO} rotate={-4} display={100} />
+            </BoardScrap>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
+
+// the phone version of the pinned scrollytelling. same three chapters, but
+// scroll-LINKED rather than scroll-captured: the pane pins for MOBILE_ROOT_VH
+// and the scroll position (not a captured gesture) picks the chapter, so it
+// feels like native scrolling — the copy swipes and each logo tapes on beside
+// the polaroid as you pass its band, then the page releases to the next section.
+function MobileChapters() {
+  const [active, setActive] = useState(0);
+  const [direction, setDirection] = useState(1);
+  const activeRef = useRef(0);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  const { scrollYProgress } = useScroll({
+    target: rootRef,
+    offset: ["start start", "end end"],
+  });
+
+  // three even bands across the pinned scroll pick the active chapter. a small
+  // gap between the switch points keeps a chapter from flickering when you hover
+  // right on a boundary.
+  useMotionValueEvent(scrollYProgress, "change", (v) => {
+    const idx = v >= 0.6 ? 2 : v >= 0.3 ? 1 : 0;
+    if (idx !== activeRef.current) {
+      setDirection(idx > activeRef.current ? 1 : -1);
+      activeRef.current = idx;
+      setActive(idx);
+    }
+  });
+
+  const ActiveChapter = CHAPTERS[active];
+
+  return (
+    <div ref={rootRef} style={{ height: `${MOBILE_ROOT_VH}vh` }}>
+      <div className="sticky top-0 flex h-screen flex-col overflow-hidden px-6 pb-8 pt-[5.5rem]">
+        <MobileBoard active={active} />
+
+        {/* heading, then the chapter copy swiping in place under it. the type is
+            tightened here (smaller heading + body) for the phone via variant
+            overrides, so the shared chapter components stay untouched. */}
+        <div className="mt-6 [&_h2]:mb-4 [&_h2]:text-2xl">
+          <AboutHeading />
+        </div>
+        {/* the copy swipes as one block (fade + horizontal slide) keyed off the
+            active chapter — direction comes from scroll. done at the block level
+            rather than per-paragraph so it reliably reveals on a phone (the
+            desktop per-line stagger relies on variant broadcasting that doesn't
+            re-fire cleanly here). `overflow-hidden` keeps the slide off-canvas
+            from widening the page. */}
+        <div className="relative flex-1 overflow-hidden [&_.mt-5]:mt-3 [&_.mt-7]:mt-3 [&_p]:text-[13px] [&_p]:leading-[1.55]">
+          <AnimatePresence initial={false} custom={direction}>
+            <motion.div
+              key={active}
+              // scrollable so a long chapter (maqsad) can be read in full on a
+              // short screen; when its scroll hits the end, the gesture chains to
+              // the page and advances to the next chapter. `pb-6` gives the last
+              // line breathing room above the dots.
+              className="absolute inset-0 flex flex-col justify-start overflow-y-auto pb-6"
+              initial={{ opacity: 0, x: direction >= 0 ? 36 : -36 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: direction >= 0 ? -36 : 36 }}
+              transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+            >
+              <ActiveChapter />
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* which chapter you're in — indicators only (the scroll drives it). */}
+        <ul className="mt-4 flex justify-center gap-2.5">
+          {CHAPTER_LABELS.map((label, i) => (
+            <li key={label}>
+              <span
+                aria-hidden="true"
+                className={`block h-2 w-2 rounded-full transition-colors ${
+                  i === active ? "bg-wax" : "bg-ink/20"
+                }`}
+              />
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
 // the fallback, and what the server always renders: the same three chapters
 // stacked in normal flow, each fading and rising in once as it scrolls into
 // view. no pin, no progress tracking.
@@ -732,12 +869,14 @@ function StackedChapters() {
 }
 
 export function AboutFold() {
-  const pinned = usePinnedLayout();
+  const mode = useAboutMode();
 
   return (
     <section id="about" className="bg-paper pb-12 sm:pb-14">
       <div>
-        {pinned ? <PinnedChapters /> : <StackedChapters />}
+        {mode === "desktop" && <PinnedChapters />}
+        {mode === "mobile" && <MobileChapters />}
+        {mode === "stacked" && <StackedChapters />}
       </div>
     </section>
   );
