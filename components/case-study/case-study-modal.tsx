@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { CaseStudyNoteBody } from "@/components/case-study/case-study-note";
+import { CaseStudyToc } from "@/components/case-study/case-study-toc";
 
 // the case study a card opens, as an in-page pop-up rather than a route change.
 // `study` being null means nothing's open (the overlay is unmounted).
@@ -26,6 +27,7 @@ export function CaseStudyModal({
 }) {
   const shouldReduceMotion = useReducedMotion();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const noteRef = useRef<HTMLDivElement>(null);
 
   // when the open study changes (e.g. a cross-study link swaps the note in
   // place), jump the scroll back to the top so the new study starts at its head.
@@ -52,9 +54,10 @@ export function CaseStudyModal({
   if (!study) return null;
 
   return (
-    // plain conditional mount rather than AnimatePresence: the note pops in on
-    // mount and unmounts instantly on close. (AnimatePresence's exit was leaving
-    // the faded-out overlay mounted over the page, blocking every click.)
+    <>
+    {/* plain conditional mount rather than AnimatePresence: the note pops in on
+        mount and unmounts instantly on close. (AnimatePresence's exit was leaving
+        the faded-out overlay mounted over the page, blocking every click.) */}
     <motion.div
       ref={scrollRef}
       className="fixed inset-0 z-[100] flex justify-center overflow-y-auto overscroll-contain bg-ink/40 px-4 py-10 backdrop-blur-sm sm:px-8 sm:py-16"
@@ -69,6 +72,7 @@ export function CaseStudyModal({
       {/* the note pops up from slightly small + low, springing into place.
           stops click-through so clicks inside it don't close the overlay. */}
       <motion.div
+        ref={noteRef}
         className="relative my-auto w-full max-w-3xl"
         initial={
           shouldReduceMotion
@@ -119,5 +123,13 @@ export function CaseStudyModal({
             </article>
       </motion.div>
     </motion.div>
+
+    <CaseStudyToc
+      scrollRef={scrollRef}
+      noteRef={noteRef}
+      slug={study.slug}
+      noteColor={study.note}
+    />
+    </>
   );
 }

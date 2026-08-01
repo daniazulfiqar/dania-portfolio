@@ -5,12 +5,11 @@
     </marker>
   </defs>
 
-  <!-- murshid platform (accent) -->
+  <!-- our platform (accent) -->
   <rect x="34" y="140" width="226" height="140" rx="14" fill="#fdfbf3" stroke="#c08a2d" stroke-width="3" />
-  <text x="147" y="190" text-anchor="middle" font-size="24" font-weight="600" fill="#2c2620">murshid</text>
-  <text x="147" y="220" text-anchor="middle" font-size="15" fill="#6b6255">the platform i built —</text>
-  <text x="147" y="242" text-anchor="middle" font-size="15" fill="#6b6255">picks a model</text>
-  <text x="147" y="264" text-anchor="middle" font-size="15" fill="#6b6255">per exam</text>
+  <text x="147" y="196" text-anchor="middle" font-size="22" font-weight="600" fill="#2c2620">our platform</text>
+  <text x="147" y="226" text-anchor="middle" font-size="15" fill="#6b6255">picks a model</text>
+  <text x="147" y="248" text-anchor="middle" font-size="15" fill="#6b6255">per exam</text>
 
   <!-- branch arrows -->
   <path d="M 260 185 L 372 150" fill="none" stroke="#6b6255" stroke-width="2.5" marker-end="url(#mr-arrow)" />

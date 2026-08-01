@@ -185,13 +185,13 @@ export function ContactFold() {
           chevron, so it reads as an aside rather than another CTA. */}
       <motion.a
         href="#snake"
-        className="group mt-32 flex w-fit max-w-none flex-col items-center gap-2 px-6 text-center sm:mt-44"
+        className="group mt-32 flex flex-col items-center gap-2 px-6 text-center sm:mt-44 sm:w-fit sm:max-w-none"
         initial={shouldReduceMotion ? false : { opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6, delay: 1 }}
       >
-        <span className="whitespace-nowrap font-body text-xs italic text-ink/40 transition-colors duration-200 group-hover:text-wax sm:text-sm">
+        <span className="max-w-[16rem] whitespace-normal font-body text-xs italic text-ink/40 transition-colors duration-200 group-hover:text-wax sm:max-w-none sm:whitespace-nowrap sm:text-sm">
           or scroll down if you want a break from the day and play the snake game
         </span>
         <motion.svg

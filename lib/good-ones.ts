@@ -34,8 +34,8 @@ export const goodOnes: GoodOne[] = [
     id: "acquisition-pipeline",
     title: "ai acquisition pipeline",
     summary:
-      "built a three-agent system (sales agent, classifying agent, campaign analyser) to better understand lead quality and conversion",
-    tags: ["multi-agent system", "lead classification", "conversion"],
+      "built a three agent system (sales agent, classifying agent, campaign analyser) to better understand lead quality and conversion",
+    tags: ["multi agent system", "lead classification", "conversion"],
     icon: "trend",
     company: "maqsad",
     thumbnail: "pipeline",

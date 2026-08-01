@@ -1,17 +1,19 @@
 # student counsellor
 
-maqsad's admissions counsellor for stressed-out exam students. it guides them through exams, prep options, and handles enrollment end to end.
+maqsad's admissions counsellor for stressed out exam students. it guides them through exams, prep options, and handles enrollment end to end.
 
 llm agent · tool calling · student psychology
 
 ---
 
-## summary
+# summary
 
-- students reach us on whatsapp faster than a small sales team can answer, at all hours, with high-stakes questions
+- students reach us on whatsapp faster than a small sales team can answer, at all hours, with high stakes questions
 - i built an llm counsellor that holds a real conversation in roman urdu and english, pulls each student's actual data and our actual prices through tools, and runs 24/7
 - qualified lead rate went from 30% to 85%+
 - 500+ leads a day handled by the bot, so the sales team could focus on converting instead of qualifying (~95% of chats now handled by the bot)
+
+# what students needed
 
 ## the problem
 
@@ -19,42 +21,44 @@ llm agent · tool calling · student psychology
 - we were getting more leads than the sales team could actually handle
 - gen z texts. they don't want calls. so the entire conversation, start to enrollment, happens on whatsapp
 - the questions were not simple: exam patterns, weightages, merit, university options, prep plans. every student wanted detail before committing
-- these are high-stakes exams. a student's whole future rides on the result, so they're stressed and ask everything twice before they trust you enough to pay
+- these are high stakes exams. a student's whole future rides on the result, so they're stressed and ask everything twice before they trust you enough to pay
 - most of them study or scroll late at night, and a small team couldn't reply at odd hours. leads went cold while they waited
 - so students dropped off before they ever got to enrollment
 
 what they actually needed was a counsellor. someone who handholds them through the confusion first, builds trust, and only then moves them toward enrolling. the counselling is the funnel.
 
-## why a counsellor, and why an llm
+## why a counsellor
 
 there were three options.
 
 - **more humans.** we didn't have the resources to hire a team big enough to cover 500 leads a day at 2am, each asking detailed questions and needing to be walked through slowly. every hire also has to be trained on patterns, merit, batches, pricing. expensive, and it still breaks at odd hours
-- **a rules or button-menu bot.** ruled out fast. our students don't ask clean questions, and they don't always type in plain english, it's often roman urdu. they ask things like whether their aggregate is enough for a specific university, or how much time they'd get if they joined today. a decision tree can't hold that. the second a student goes off-script it dead-ends, and a dead-end is what makes a stressed kid leave
+- **a rules or button menu bot.** ruled out fast. our students don't ask clean questions, and they don't always type in plain english, it's often roman urdu. they ask things like whether their aggregate is enough for a specific university, or how much time they'd get if they joined today. a decision tree can't hold that. the second a student goes off script it dead ends, and a dead end is what makes a stressed kid leave
 - **an llm counsellor.** the only option that could do the job
 
 what the llm gave me that the others couldn't:
 
-- holds a natural back-and-forth in the roman urdu and english our students actually type
-- answers messy, out-of-order questions without breaking
+- holds a natural back and forth in the roman urdu and english our students actually type
+- answers messy, out of order questions without breaking
 - runs 24/7, so the 2am student gets the same attention as the 2pm one
 - pulls real data through tools, so it quotes this student's actual status and our actual prices, not a generic pitch
 
 the thing i cared about most: a rules bot responds, an llm counsels. a stressed student can tell the difference, and the difference is whether they trust us enough to pay.
 
-## what good counselling looks like
+## defining good counselling
 
 before building anything, i pinned down what a good reply has to do. everything after this serves these three bars.
 
 - **empathy.** meet a stressed student where they are
   - in their language, warm not robotic
   - answer the actual question before pushing anything
-- **accuracy.** every student-specific fact and every price is real, pulled from a tool or the verified knowledge base. nothing invented
+- **accuracy.** every student specific fact and every price is real, pulled from a tool or the verified knowledge base. nothing invented
 - **knowing when to stop.** recognise when it's out of its depth or the chat has gone irrelevant, and hand off or unassign instead of pushing
 
 the rest of this is how the build hits each bar, and where it missed and i had to fix it.
 
-## how it's wired
+# how we built it
+
+## how it's put together
 
 when a message comes in from a lead, it doesn't go straight to the model. it passes through our own middleware first, which pulls that student's context on the way in and runs any backend action on the way out.
 
@@ -74,7 +78,7 @@ the important bit:
 - the middleware runs the real backend call and feeds the result back to the model
 - the model loops until it has a final reply. i own that loop
 
-![the tool-use loop | the model asks for a tool, the middleware runs the real backend call and feeds the result back, looping until there's a final reply](/images/work/counsellor/tool-loop.svg)
+![the tool use loop | the model asks for a tool, the middleware runs the real backend call and feeds the result back, looping until there's a final reply](/images/work/counsellor/tool-loop.svg)
 
 - this is also why the bot never asks a student for their phone number. the middleware pulls it from the chatwoot conversation and injects it as context. the model already knows who it's talking to
 
@@ -82,7 +86,7 @@ the important bit:
 
 - a lot of students don't type, they send voicenotes
 - so i wired a transcription model into the same middleware path. the voicenote gets transcribed, and the text is what the counsellor responds to
-- one catch: a very long voicenote (5-6 minutes) eats a lot of tokens to transcribe
+- one catch: a very long voicenote (5 to 6 minutes) eats a lot of tokens to transcribe
 - so there's a fallback. past a length threshold, instead of transcribing the whole thing, the bot replies asking the student to send a shorter message
 
 ## the tools
@@ -97,7 +101,7 @@ the agent has 9 tools. two groups: the ones that run in a fixed sequence at the 
 | `create-user` | creates an account. only fires if the profile came back null |
 | `get-products` | fetches the products for that exam: names, ids, prices. the price source of truth |
 
-**the model decides, mid-conversation:**
+**the model decides, mid conversation:**
 
 | tool | what it does | what makes it fire |
 |---|---|---|
@@ -118,7 +122,7 @@ a few are worth the story, because they're where the product thinking is.
 
 ### the two fetches that make it a counsellor, not a script
 
-everything specific the bot says about you comes from a live call mid-conversation, not the model's memory.
+everything specific the bot says about you comes from a live call mid conversation, not the model's memory.
 
 - **student fetch** (`get-user-profile`, keyed on phone): who they are, what they've enrolled in, what they've bought. this is how the bot greets a returning student by name and doesn't sell them something they already have
 - **product fetch** (`get-products`): the actual batches, prices, and features for that exam, pulled fresh every conversation
@@ -136,7 +140,7 @@ everything specific the bot says about you comes from a live call mid-conversati
 
 ![assign-agent's three jobs | hand a chat to a human when the bot is out of its depth, route a student to the right exam's counsellor, or unassign the bot on an irrelevant lead so it goes quiet and stops burning tokens](/images/work/counsellor/assign-agent.svg)
 
-under the hood it takes a chatwoot agent id, and each id is a real human or desk — so when the model calls it, chatwoot reassigns the conversation, the bot goes silent, and a person owns it from there. that third job, dropping irrelevant chats, is the "knowing when to stop" bar in code: the bot deciding when it shouldn't be the one talking.
+under the hood it takes a chatwoot agent id, and each id is a real human or desk, so when the model calls it, chatwoot reassigns the conversation, the bot goes silent, and a person owns it from there. that third job, dropping irrelevant chats, is the "knowing when to stop" bar in code: the bot deciding when it shouldn't be the one talking.
 
 ### `assign-label` gives the sales team a head start
 
@@ -144,9 +148,9 @@ under the hood it takes a chatwoot agent id, and each id is a real human or desk
 - the agent knows what they're walking into before they open it
 - small thing, big difference to how fast the team works a queue
 
-## the guardrail: it can't invent a price, a discount, or a validity
+## the guardrail
 
-this is the accuracy bar, and the one with the least room for error. a wrong price or a made-up merit number destroys trust instantly with a student whose future is on the line.
+this is the accuracy bar, and the one with the least room for error. a wrong price or a made up merit number destroys trust instantly with a student whose future is on the line.
 
 - it started as a real failure. when the counsellor was just a prompt and a model, it hallucinated
 - the way it hallucinated was very human: a student would express a money worry, the model would feel for them, and it would offer a product free or discounted that did not exist. empathy, but expensive
@@ -159,13 +163,13 @@ on top of that:
 
 - **`get-user-products` stops misselling.** before pitching, the model checks what the student already owns and how long it's valid. it can't sell a batch they already bought, and it reads validity off real data instead of guessing. this is the tool i lean on most
 - **discounts are structural, not verbal.** a student can't talk the bot into a discount. promo codes only apply inside the app. the bot never honours a claimed discount or invoices a custom amount
-- **a fallback price for the rare failure.** if the product fetch fails, the bot used to say "can't fetch," which dead-ends the chat. i added a hardcoded fallback price so the student still gets an answer and the chat keeps moving
+- **a fallback price for the rare failure.** if the product fetch fails, the bot used to say "can't fetch," which dead ends the chat. i added a hardcoded fallback price so the student still gets an answer and the chat keeps moving
 
-- a verified-facts foundation pins the things students most often get wrong. the exam is 180 marks, full stop. it never calculates merit, it sends them to the official calculator. anything it isn't sure of, it flags as best confirmed on the official page
+- a verified facts foundation pins the things students most often get wrong. the exam is 180 marks, full stop. it never calculates merit, it sends them to the official calculator. anything it isn't sure of, it flags as best confirmed on the official page
 
 ![the counsellor's system prompt | the INIT sequence that runs on every conversation, and the NO FABRICATION hard rule at the top](/images/work/counsellor/instructions-box.jpg)
 
-## how the system evolved
+## how it evolved
 
 wiring prices to a function fixed invented prices. exam facts were the other half of the accuracy bar, and getting them right pushed two bigger changes. both were about getting brittle things out of the prompt.
 
@@ -174,7 +178,7 @@ wiring prices to a function fixed invented prices. exam facts were the other hal
 - early on i put everything in the system prompt: every university, paper pattern, expected merit, and date for MDCAT and ECAT
 - it didn't work. the prompt got huge, and the bot still hallucinated facts out of that wall of text
 - so i moved all the static exam information into a knowledge base file and turned on file search
-- now the bot fact-checks what it's about to say against that file instead of carrying it in the prompt
+- now the bot fact checks what it's about to say against that file instead of carrying it in the prompt
 - the prompt got lighter and the answers got more accurate at the same time
 
 it also drew a line i now think is right:
@@ -191,16 +195,16 @@ the platform i keep mentioning wasn't the original plan. here's how we ended up 
 
 - we started on openai's assistants playground. the interface was already there, so we plugged in our functions and prompt and moved fast
 - then openai deprecated the assistants api and pushed everyone onto the new responses api
-- for us that wasn't a quick swap. our whole crm ran on typebot and chatwoot, the middleware was built around that flow, and the sales team lived in it every day. moving meant re-plumbing all of it and retraining the team
+- for us that wasn't a quick swap. our whole crm ran on typebot and chatwoot, the middleware was built around that flow, and the sales team lived in it every day. moving meant replumbing all of it and retraining the team
 
-so rather than rebuild everything onto openai's new api — and be exposed to the next deprecation whenever it came — we built our own assistants platform in-house.
+so rather than rebuild everything onto openai's new api, and risk the next deprecation whenever it came, we built our own assistants platform in house.
 
 - it kept everything we relied on: file search, tools, instructions
 - and it gave us something the playground never did: a different model per assistant
 
 ![the assistants platform we built | each counsellor is its own assistant, here MDCAT on claude sonnet 5, with instructions, knowledge, and tools tabs](/images/work/counsellor/config-page.jpg)
 
-that model-per-assistant part is where it pays off.
+that model per assistant part is where it pays off.
 
 - a simpler exam can run a lighter, cheaper model like haiku
 - a heavy exam like MDCAT or ECAT, with all its dates and merits and nuance, runs a stronger model like sonnet or opus
@@ -214,7 +218,9 @@ what we got out of building it:
 - it came out cheaper
 - and it's ours, so we can change it whenever we need to
 
-## how i know it's working
+# how it performed
+
+## how i know it works
 
 once the build was stable, the question was whether it actually hit those three bars, across 500 conversations a day. reading them by hand doesn't scale, so the counsellor doesn't grade itself and neither do i.
 
@@ -230,14 +236,14 @@ the eval loop:
 - that gives me a daily read on quality without reading a single transcript
 - detection, then diagnosis:
   - the number tells me something slipped, not why
-  - when the qualified-rate drops, i read the transcripts from that window to find the cause
+  - when the qualified rate drops, i read the transcripts from that window to find the cause
   - the number is the smoke alarm, the transcripts are where i find the fire
 
 - the full bucket taxonomy, and how these scores drive ad spend, is its own system:
-  - covered in the [acquisition-pipeline case study →](#cs-acquisition-pipeline)
+  - covered in the [acquisition pipeline case study →](#cs-acquisition-pipeline)
   - here i'm using the classifier for one thing: the counsellor's report card
 
-## where it failed and what i changed
+## where it failed
 
 each of these was one of the bars slipping, caught by the eval loop above: the metric flagged it, the transcript explained it.
 
@@ -245,8 +251,8 @@ each of these was one of the bars slipping, caught by the eval loop above: the m
 |---|---|
 | gave away free and discounted products out of empathy | wired pricing to `get-products`, so it can only quote real products at real prices (the guardrail above) |
 | pitched enrollment in every single message, read as pushy | rebuilt the persona into a senior counsellor who answers the real question before nudging |
-| re-asked questions the student had already answered across earlier messages | made it read the full thread history first, plus a cap so it never asks the same detail twice |
-| dead-ended when `get-products` failed | added a hardcoded fallback price so the chat keeps moving (the guardrail above) |
+| reasked questions the student had already answered across earlier messages | made it read the full thread history first, plus a cap so it never asks the same detail twice |
+| dead ended when `get-products` failed | added a hardcoded fallback price so the chat keeps moving (the guardrail above) |
 
 ## the tradeoffs
 
@@ -269,11 +275,11 @@ fixing those left me with a few tensions i couldn't fully design away.
 the outcome it feeds into:
 
 - **conversion: 2% to 10%.** that's the whole [acquisition system](#cs-acquisition-pipeline) moving (ad targeting, lead scoring, and the counsellor together), not the bot alone
-- the counsellor's clean contribution to it is the qualified-rate above. i'd rather own that number than claim one i share
+- the counsellor's clean contribution to it is the qualified rate above. i'd rather own that number than claim one i share
 
-## what i'd improve next
+## what i'd improve
 
-- **re-engagement.** a lead that goes quiet stays quiet. next is a scheduled follow-up that reaches back out within whatsapp's rules, so we don't lose the ones who just got busy or scared
+- **reengagement.** a lead that goes quiet stays quiet. next is a scheduled follow up that reaches back out within whatsapp's rules, so we don't lose the ones who just got busy or scared
 - **sharper eval.** score chats against the three bars directly (empathy, accuracy, knowing when to stop), so a bad reply gets flagged on its own terms
-- **test before shipping.** run each prompt change against a held-out set of past problem chats, so i can prove a fix helped instead of watching the next day's number and hoping
+- **test before shipping.** run each prompt change against a held out set of past problem chats, so i can prove a fix helped instead of watching the next day's number and hoping
 - **smarter routing.** get sharper about which chats actually need the heavier model, so we spend expensive tokens only where they change the answer

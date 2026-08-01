@@ -153,6 +153,20 @@ export function EnvelopeHero() {
   const sectionRef = useRef<HTMLElement>(null);
   const [noteOpen, setNoteOpen] = useState(false);
 
+  // the hero's rest positions + scroll choreography differ on phones (below lg):
+  // the note peeks higher, the claude sits nearer centre, the items eject over
+  // almost the whole pinned scroll, and the envelope itself stays put instead of
+  // drifting — so on a phone you scroll the items fully out of a held envelope
+  // before the page moves on. desktop keeps its original feel.
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1023px)");
+    const sync = () => setIsMobile(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
   // one control drives both the "peek" hint and the hover invite: the note
   // lifts a few px out of the pocket. on load it does it once, unprompted, so
   // you know the note comes out; hovering the envelope repeats it on demand.
@@ -188,17 +202,24 @@ export function EnvelopeHero() {
   // the right so it clears the note instead of stacking over it. the sideways
   // slide is held back until it's begun rising (so its side stays hidden in
   // the pocket at rest, then it fans out once it's above the panel edge).
-  const photoBottom = useTransform(scrollYProgress, [0, 0.6], ["22%", "60%"]);
-  const photoRight = useTransform(scrollYProgress, [0.15, 0.6], ["20%", "9%"]);
-  const photoRotate = useTransform(scrollYProgress, [0, 0.6], [8, -6]);
+  // on mobile the emergence finishes later in the scroll (0.85 vs 0.6) so the
+  // items keep rising for almost the whole pinned scroll instead of popping out
+  // in the first third and then sitting through dead scroll.
+  const photoEnd = isMobile ? 0.85 : 0.6;
+  const noteEnd = isMobile ? 0.9 : 0.65;
+  const photoBottom = useTransform(scrollYProgress, [0, photoEnd], ["22%", "60%"]);
+  const photoRight = useTransform(scrollYProgress, [0.15, photoEnd], ["20%", "9%"]);
+  const photoRotate = useTransform(scrollYProgress, [0, photoEnd], [8, -6]);
 
   // ...then the note follows just a beat behind (they come out together, so
   // the reveal stays short), rising up AND sliding out to the left.
   // rest position sits the note low in the pocket so only its heading clears
   // the front panel's V-edge before you scroll; scrolling raises it fully out.
-  const noteBottom = useTransform(scrollYProgress, [0.12, 0.65], ["10%", "54%"]);
-  const noteLeft = useTransform(scrollYProgress, [0.22, 0.65], ["20%", "9%"]);
-  const noteRotate = useTransform(scrollYProgress, [0.12, 0.65], [5, -2]);
+  // the note rests higher on mobile ("18%" vs "10%") so its heading peeks above
+  // the pocket at rest, the way the polaroid's corner does.
+  const noteBottom = useTransform(scrollYProgress, [0.12, noteEnd], [isMobile ? "18%" : "10%", "54%"]);
+  const noteLeft = useTransform(scrollYProgress, [0.22, noteEnd], ["20%", "9%"]);
+  const noteRotate = useTransform(scrollYProgress, [0.12, noteEnd], [5, -2]);
 
   // the crowned claude mascot: tucked deep in the pocket at rest (hidden behind
   // the front panel), then — once the photo has begun emerging — it rises up and
@@ -213,8 +234,10 @@ export function EnvelopeHero() {
   // photo/note, no opacity or clip-path fakery needed. it only starts rising
   // once the photo is already moving (0.05, vs. the photo's 0), so it reads
   // as following the photo out rather than appearing on its own.
-  const claudeBottom = useTransform(scrollYProgress, [0.05, 0.6], ["18%", "91%"]);
-  const claudeRight = useTransform(scrollYProgress, [0.18, 0.6], ["27%", "16%"]);
+  // claude sits nearer the centre on mobile (larger `right` = further from the
+  // right edge) so it doesn't crowd the right side of the frame.
+  const claudeBottom = useTransform(scrollYProgress, [0.05, photoEnd], ["18%", "91%"]);
+  const claudeRight = useTransform(scrollYProgress, [0.18, photoEnd], [isMobile ? "40%" : "27%", isMobile ? "26%" : "16%"]);
 
   // the whole envelope drifts up a touch and eases forward as you scroll, so
   // the scene feels alive rather than frozen while the note/photo come out.
@@ -274,7 +297,7 @@ export function EnvelopeHero() {
           <div className="pointer-events-none absolute inset-0" aria-hidden="true">
             <motion.div
               className="absolute inset-[-6%]"
-              style={shouldReduceMotion ? undefined : { y: bgY }}
+              style={shouldReduceMotion || isMobile ? undefined : { y: bgY }}
             >
               <Image
                 src="/hero-bg.jpg"
@@ -304,7 +327,7 @@ export function EnvelopeHero() {
           <motion.div
           className="relative mx-auto w-full max-w-[23rem] sm:max-w-[26rem] md:max-w-[29rem] lg:max-w-[min(76vh,48rem)] xl:max-w-[min(78vh,56rem)] 2xl:max-w-[min(80vh,66rem)]"
           style={
-            shouldReduceMotion
+            shouldReduceMotion || isMobile
               ? undefined
               : { y: envelopeY, scale: envelopeScale, rotate: envelopeRotate }
           }

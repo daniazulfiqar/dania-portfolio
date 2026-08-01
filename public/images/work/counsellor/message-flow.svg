@@ -24,8 +24,8 @@
   <rect x="484" y="108" width="200" height="144" rx="14" fill="#fdfbf3" stroke="#c08a2d" stroke-width="3" />
   <text x="584" y="152" text-anchor="middle" font-size="22" font-weight="600" fill="#2c2620">our middleware</text>
   <text x="584" y="182" text-anchor="middle" font-size="15" fill="#6b6255">injects the phone #,</text>
-  <text x="584" y="204" text-anchor="middle" font-size="15" fill="#6b6255">owns the tool-use loop</text>
-  <text x="584" y="226" text-anchor="middle" font-size="15" fill="#6b6255">— i own this</text>
+  <text x="584" y="204" text-anchor="middle" font-size="15" fill="#6b6255">owns the tool use loop</text>
+  <text x="584" y="226" text-anchor="middle" font-size="15" fill="#6b6255">i own this</text>
 
   <!-- bidirectional loop between middleware and model -->
   <line x1="688" y1="180" x2="734" y2="180" stroke="#6b6255" stroke-width="2.5" marker-start="url(#mf-arrow)" marker-end="url(#mf-arrow)" />

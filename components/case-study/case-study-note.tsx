@@ -1,10 +1,30 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import type { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { DRAFT_NOTE } from "@/lib/case-studies";
+
+// flatten a heading's children to plain text, then to a url-safe slug — used as
+// the heading's id so the in-note table of contents (case-study-toc) can jump
+// to it.
+function nodeText(node: ReactNode): string {
+  if (node == null || node === false) return "";
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(nodeText).join("");
+  if (typeof node === "object" && "props" in node) {
+    return nodeText((node as { props?: { children?: ReactNode } }).props?.children);
+  }
+  return "";
+}
+
+export function slugifyHeading(node: ReactNode): string {
+  return nodeText(node)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
 
 // a captioned dashed box standing in for a diagram/screenshot until the real
 // asset is dropped in. every image + author "screenshot to add here" note in
@@ -46,20 +66,32 @@ function makeComponents(
   onOpenStudy?: (slug: string) => void,
 ): Components {
   return {
+  // markdown `#` is an act heading — the story's three-ish beats. `data-act`
+  // marks it for the table of contents (case-study-toc reads only these), and a
+  // hairline rule + big top margin make each one read as a new chapter.
   h1: ({ children }) => (
-    <h2 className="mb-4 mt-14 font-heading text-2xl font-semibold text-wax">
+    <h2
+      data-act=""
+      id={slugifyHeading(children)}
+      className="mb-6 mt-20 scroll-mt-4 border-t border-ink/15 pt-9 font-heading text-3xl font-bold text-wax first:mt-0 first:border-t-0 first:pt-0"
+    >
       {children}
     </h2>
   ),
+  // markdown `##` is a section within an act.
   h2: ({ children }) => (
-    <h2 className="mb-4 mt-14 font-heading text-2xl font-semibold text-wax">
-      {children}
-    </h2>
-  ),
-  h3: ({ children }) => (
-    <h3 className="mb-2 mt-8 font-heading text-lg font-semibold text-ink">
+    <h3
+      id={slugifyHeading(children)}
+      className="mb-3 mt-11 scroll-mt-4 font-heading text-xl font-semibold text-ink"
+    >
       {children}
     </h3>
+  ),
+  // markdown `###` is a sub-point within a section.
+  h3: ({ children }) => (
+    <h4 className="mb-2 mt-7 font-heading text-base font-semibold text-ink/90">
+      {children}
+    </h4>
   ),
   p: ({ node, children }) => {
     // standalone images arrive wrapped in a <p>; unwrap so the placeholder
