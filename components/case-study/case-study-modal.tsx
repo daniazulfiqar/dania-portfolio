@@ -89,12 +89,14 @@ export function CaseStudyModal({
               className="pointer-events-none absolute -top-4 left-1/2 z-10 h-8 w-32 -translate-x-1/2 -rotate-1 bg-ochre/25"
             />
 
-            {/* close button, tucked into the top-right of the note */}
+            {/* close button, tucked into the top-right of the note. desktop only —
+                on a phone the note scrolls past it, so a viewport-fixed one (below)
+                takes over there. */}
             <button
               type="button"
               onClick={onClose}
               aria-label="close case study"
-              className="absolute right-3 top-3 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-ink/5 text-ink/60 transition hover:bg-ink/10 hover:text-ink"
+              className="absolute right-3 top-3 z-20 hidden h-9 w-9 items-center justify-center rounded-full bg-ink/5 text-ink/60 transition hover:bg-ink/10 hover:text-ink sm:flex"
             >
               <svg
                 viewBox="0 0 24 24"
@@ -110,7 +112,7 @@ export function CaseStudyModal({
             </button>
 
             <article
-              className="relative rounded-[4px] px-6 py-10 shadow-[0_28px_60px_-24px_rgba(44,38,32,0.6)] ring-1 ring-black/5 sm:px-14 sm:py-16"
+              className="relative rounded-[4px] px-5 py-8 shadow-[0_28px_60px_-24px_rgba(44,38,32,0.6)] ring-1 ring-black/5 sm:px-14 sm:py-16 max-sm:[&_.mt-12]:mt-7 max-sm:[&_.pt-10]:pt-6 max-sm:[&_[data-act]]:mb-4 max-sm:[&_[data-act]:not(:first-child)]:mt-10 max-sm:[&_[data-act]:not(:first-child)]:pt-6 max-sm:[&_blockquote]:text-[13px] max-sm:[&_h2]:text-2xl max-sm:[&_h3]:mt-7 max-sm:[&_h3]:text-lg max-sm:[&_h4]:mt-5 max-sm:[&_h4]:text-sm max-sm:[&_li]:text-[13px] max-sm:[&_li]:leading-[1.55] max-sm:[&_ol]:my-3 max-sm:[&_p]:my-3 max-sm:[&_p]:text-[13px] max-sm:[&_p]:leading-[1.55] max-sm:[&_td]:text-xs max-sm:[&_th]:text-xs max-sm:[&_ul]:my-3"
               style={{ backgroundColor: study.note }}
             >
               <CaseStudyNoteBody
@@ -123,6 +125,29 @@ export function CaseStudyModal({
             </article>
       </motion.div>
     </motion.div>
+
+    {/* phone-only close: kept OUTSIDE the scroll container (its backdrop-blur
+        establishes a containing block that would trap a `fixed` child and let it
+        scroll away). here at the top level it stays pinned to the viewport
+        top-right, reachable however far the note is scrolled. */}
+    <button
+      type="button"
+      onClick={onClose}
+      aria-label="close case study"
+      className="fixed right-4 top-4 z-[130] flex h-10 w-10 items-center justify-center rounded-full bg-ink/70 text-paper shadow-lg backdrop-blur-sm transition hover:bg-ink sm:hidden"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        className="h-4 w-4"
+        aria-hidden="true"
+      >
+        <path d="M6 6l12 12M18 6L6 18" />
+      </svg>
+    </button>
 
     <CaseStudyToc
       scrollRef={scrollRef}

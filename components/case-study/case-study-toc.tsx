@@ -234,7 +234,7 @@ export function CaseStudyToc({
       <button
         type="button"
         onClick={() => go(s.id)}
-        className={`block w-full rounded-md px-3 py-2 text-left font-body text-sm transition-colors ${
+        className={`block w-full rounded-md px-2.5 py-1.5 text-left font-body text-[13px] leading-snug transition-colors ${
           active ? "bg-wax font-medium text-paper" : "text-wax hover:bg-wax/10"
         }`}
       >
@@ -310,7 +310,7 @@ export function CaseStudyToc({
       {!showRail && (
         <div className="fixed bottom-5 right-5 z-[110]">
           {open && (
-            <div className="absolute bottom-12 right-0 max-h-[60vh] w-60 overflow-y-auto rounded-2xl bg-paper p-2 shadow-2xl ring-1 ring-ink/10">
+            <div className="absolute bottom-12 right-0 max-h-[60vh] w-52 overflow-y-auto rounded-2xl bg-paper p-1.5 shadow-2xl ring-1 ring-ink/10">
               <ul className="flex flex-col gap-0.5">
                 {sections.map((s) => (
                   <li key={s.id}>{panelTab(s)}</li>
@@ -323,7 +323,7 @@ export function CaseStudyToc({
             onClick={() => setOpen((o) => !o)}
             aria-expanded={open}
             aria-label="sections"
-            className="flex items-center gap-2 rounded-full bg-ink px-4 py-2.5 font-body text-xs uppercase tracking-[0.15em] text-paper shadow-lg transition hover:bg-ink/90"
+            className="flex items-center gap-1.5 rounded-full bg-ink px-3.5 py-2 font-body text-[11px] uppercase tracking-[0.12em] text-paper shadow-lg transition hover:bg-ink/90"
           >
             <svg
               viewBox="0 0 24 24"
@@ -331,7 +331,7 @@ export function CaseStudyToc({
               stroke="currentColor"
               strokeWidth="2"
               strokeLinecap="round"
-              className="h-4 w-4"
+              className="h-3.5 w-3.5"
               aria-hidden="true"
             >
               {open ? (

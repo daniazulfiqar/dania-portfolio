@@ -484,12 +484,12 @@ function ScrapboardStack({ active }: { active: number }) {
       <div className="relative -mt-10 flex flex-col items-start gap-6">
         <AnimatePresence mode="popLayout">
           {active >= 1 && (
-            <BoardScrap keyName="maqsad">
+            <BoardScrap key="maqsad" keyName="maqsad">
               <TapedLogo logo={MAQSAD_LOGO} rotate={3} display={120} />
             </BoardScrap>
           )}
           {active >= 2 && (
-            <BoardScrap keyName="fountain" className="ml-6">
+            <BoardScrap key="fountain" keyName="fountain" className="ml-6">
               <TapedLogo logo={FOUNTAIN_LOGO} rotate={-4} display={130} />
             </BoardScrap>
           )}
@@ -728,12 +728,12 @@ function MobileBoard({ active }: { active: number }) {
       <div className="relative flex flex-col items-start gap-3">
         <AnimatePresence mode="popLayout">
           {active >= 1 && (
-            <BoardScrap keyName="maqsad">
+            <BoardScrap key="maqsad" keyName="maqsad">
               <TapedLogo logo={MAQSAD_LOGO} rotate={3} display={90} />
             </BoardScrap>
           )}
           {active >= 2 && (
-            <BoardScrap keyName="fountain" className="ml-4">
+            <BoardScrap key="fountain" keyName="fountain" className="ml-4">
               <TapedLogo logo={FOUNTAIN_LOGO} rotate={-4} display={100} />
             </BoardScrap>
           )}

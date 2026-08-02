@@ -302,7 +302,7 @@ function StickyCard({
         {/* the note itself — a flat pastel square. flex-col + h-full so tags sit
             at the bottom and every note matches the tallest in the row. */}
         <div
-          className="relative flex h-full flex-col rounded-[3px] p-4 shadow-[0_16px_34px_-12px_rgba(44,38,32,0.5)] ring-1 ring-black/5"
+          className="relative flex h-full flex-col rounded-[3px] p-4 shadow-[0_8px_20px_-14px_rgba(44,38,32,0.32)] ring-1 ring-black/5"
           style={{ backgroundColor: note }}
         >
           {/* crease shadow — opaque while the note is folded, fading out as it
@@ -602,7 +602,7 @@ export function ProjectsFold({ studies }: { studies: StudyContent }) {
     <section
       ref={sectionRef}
       id="work"
-      className="scroll-mt-24 bg-paper pt-10 pb-20 sm:pt-14 sm:pb-28"
+      className="scroll-mt-24 bg-paper pt-4 pb-20 sm:pt-14 sm:pb-28"
     >
       <motion.div
         className="mx-auto max-w-[82rem] px-6"
