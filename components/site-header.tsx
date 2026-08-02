@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BrandMark } from "./brand-mark";
 
 // nav links — anchors for now; point them at real routes/sections once those
@@ -12,12 +12,12 @@ const NAV_LINKS: { label: string; href: string; external?: boolean }[] = [
   { label: "resume", href: "/Dania_Siddiqui_CV.pdf", external: true },
 ];
 
-// socials for the mobile menu — shown as icons rather than text.
+// socials — shown as icon logos in the desktop nav and in the mobile drawer.
 type SocialIcon = "linkedin" | "github" | "mail";
 const SOCIALS: { label: string; href: string; icon: SocialIcon; external?: boolean }[] = [
+  { label: "Email", href: "mailto:dania.siddiqui2000@gmail.com", icon: "mail" },
   { label: "LinkedIn", href: "https://linkedin.com/in/daniazulfiqar", icon: "linkedin", external: true },
   { label: "GitHub", href: "https://github.com/daniazulfiqar", icon: "github", external: true },
-  { label: "Email", href: "mailto:dania.siddiqui2000@gmail.com", icon: "mail" },
 ];
 
 // same line-icon idiom as the contact fold, so the two read as one hand.
@@ -63,14 +63,30 @@ function SocialIconSvg({ name }: { name: SocialIcon }) {
   }
 }
 
-// fixed top nav, openwhen-style: a script wordmark on the left, spaced-out
-// uppercase links, and a solid pill CTA on the right, over a translucent
-// paper bar that blurs whatever scrolls beneath it. on mobile the links + CTA
-// collapse into a hamburger menu.
+// fixed top nav: a script wordmark on the left, spaced-out uppercase links, and
+// email / linkedin / github icons on the right, over a translucent paper bar
+// that blurs whatever scrolls beneath it. on mobile everything collapses into a
+// hamburger that opens a side drawer.
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
 
+  // lock body scroll and allow Esc to close while the drawer is open.
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
   return (
+    <>
     <header className="fixed inset-x-0 top-0 z-40 bg-paper/80 backdrop-blur">
       <nav className="mx-auto flex h-[4.75rem] max-w-[110rem] items-center justify-between px-4 sm:px-6">
         <BrandMark />
@@ -89,82 +105,101 @@ export function SiteHeader() {
           ))}
         </div>
 
-        {/* desktop CTA — hidden on mobile in favour of the hamburger */}
-        <a
-          href="#contact"
-          className="hidden rounded-lg bg-ink px-4 py-2 font-body text-xs uppercase tracking-[0.15em] text-paper shadow-sm transition duration-200 [transition-timing-function:var(--ease-out-quint)] hover:-translate-y-px hover:bg-ink/90 hover:shadow-md active:translate-y-0 active:scale-[0.97] motion-reduce:transform-none sm:inline-block"
-        >
-          get in touch
-        </a>
+        {/* desktop socials — replaces the old CTA */}
+        <div className="hidden items-center gap-1 sm:flex">
+          {SOCIALS.map((s) => (
+            <a
+              key={s.label}
+              href={s.href}
+              aria-label={s.label}
+              {...(s.external ? { target: "_blank", rel: "noreferrer" } : {})}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-ink-soft transition-[color,transform] duration-200 [transition-timing-function:var(--ease-out-quint)] hover:-translate-y-px hover:bg-ink/[0.05] hover:text-ink motion-reduce:hover:translate-y-0"
+            >
+              <SocialIconSvg name={s.icon} />
+            </a>
+          ))}
+        </div>
 
         {/* mobile hamburger */}
         <button
           type="button"
-          onClick={() => setOpen((v) => !v)}
+          onClick={() => setOpen(true)}
           aria-expanded={open}
-          aria-controls="mobile-menu"
-          aria-label={open ? "Close menu" : "Open menu"}
+          aria-controls="mobile-drawer"
+          aria-label="Open menu"
           className="-mr-1 inline-flex h-10 w-10 items-center justify-center rounded-lg text-ink transition-colors hover:bg-ink/[0.06] sm:hidden"
         >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            className="h-6 w-6"
-            aria-hidden="true"
-          >
-            {open ? (
-              <>
-                <path d="M6 6l12 12" />
-                <path d="M18 6 6 18" />
-              </>
-            ) : (
-              <>
-                <path d="M4 7h16" />
-                <path d="M4 12h16" />
-                <path d="M4 17h16" />
-              </>
-            )}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" className="h-6 w-6" aria-hidden="true">
+            <path d="M4 7h16" />
+            <path d="M4 12h16" />
+            <path d="M4 17h16" />
           </svg>
         </button>
       </nav>
+    </header>
 
-      {/* mobile dropdown panel */}
-      {open && (
-        <div id="mobile-menu" className="border-t border-ink/10 bg-paper/95 backdrop-blur sm:hidden">
-          <div className="flex flex-col gap-1 px-4 py-4">
-            {NAV_LINKS.map((link) => (
+      {/* mobile backdrop */}
+      <div
+        onClick={() => setOpen(false)}
+        aria-hidden="true"
+        className={`fixed inset-0 z-40 bg-ink/30 backdrop-blur-sm transition-opacity duration-300 sm:hidden ${
+          open ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+      />
+
+      {/* mobile side drawer — slides in from the right */}
+      <aside
+        id="mobile-drawer"
+        aria-label="Menu"
+        className={`fixed inset-y-0 right-0 z-50 flex w-72 max-w-[80%] flex-col bg-paper shadow-xl transition-transform duration-300 [transition-timing-function:var(--ease-out-quint)] sm:hidden ${
+          open ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="flex h-[4.75rem] items-center justify-between px-5">
+          <span className="font-body text-xs uppercase tracking-[0.15em] text-ink-soft">menu</span>
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            aria-label="Close menu"
+            className="-mr-1 inline-flex h-10 w-10 items-center justify-center rounded-lg text-ink transition-colors hover:bg-ink/[0.06]"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" className="h-6 w-6" aria-hidden="true">
+              <path d="M6 6l12 12" />
+              <path d="M18 6 6 18" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="flex flex-1 flex-col gap-1 px-4 py-2">
+          {NAV_LINKS.map((link) => (
+            <a
+              key={link.label}
+              href={link.href}
+              onClick={() => setOpen(false)}
+              {...(link.external ? { target: "_blank", rel: "noreferrer" } : {})}
+              className="rounded-lg px-3 py-3 font-body text-sm uppercase tracking-[0.15em] text-ink-soft transition-colors hover:bg-ink/[0.04] hover:text-ink"
+            >
+              {link.label}
+            </a>
+          ))}
+
+          {/* socials, as icons */}
+          <div className="mt-2 flex items-center gap-2 border-t border-ink/10 px-1 pt-4">
+            {SOCIALS.map((s) => (
               <a
-                key={link.label}
-                href={link.href}
+                key={s.label}
+                href={s.href}
+                aria-label={s.label}
                 onClick={() => setOpen(false)}
-                {...(link.external ? { target: "_blank", rel: "noreferrer" } : {})}
-                className="rounded-lg px-3 py-3 font-body text-sm uppercase tracking-[0.15em] text-ink-soft transition-colors hover:bg-ink/[0.04] hover:text-ink"
+                {...(s.external ? { target: "_blank", rel: "noreferrer" } : {})}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-ink-soft transition-colors hover:bg-ink/[0.06] hover:text-ink"
               >
-                {link.label}
+                <SocialIconSvg name={s.icon} />
               </a>
             ))}
-
-            {/* socials, as icons */}
-            <div className="mt-2 flex items-center gap-2 border-t border-ink/10 px-1 pt-4">
-              {SOCIALS.map((s) => (
-                <a
-                  key={s.label}
-                  href={s.href}
-                  aria-label={s.label}
-                  onClick={() => setOpen(false)}
-                  {...(s.external ? { target: "_blank", rel: "noreferrer" } : {})}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-ink-soft transition-colors hover:bg-ink/[0.06] hover:text-ink"
-                >
-                  <SocialIconSvg name={s.icon} />
-                </a>
-              ))}
-            </div>
           </div>
         </div>
-      )}
-    </header>
+      </aside>
+    </>
   );
 }
