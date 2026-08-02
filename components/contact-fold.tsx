@@ -157,7 +157,7 @@ const LINKS: {
   { label: "+923322344320", href: "tel:+923322344320", icon: "phone" },
   { label: "linkedin", href: "https://linkedin.com/in/daniazulfiqar", icon: "linkedin", external: true },
   { label: "github", href: "https://github.com/daniazulfiqar", icon: "github", external: true },
-  { label: "resume", href: "/Dania_Siddiqui_CV.pdf", icon: "resume", external: true },
+  { label: "resume", href: "/Dania_Siddiqui_Resume.pdf", icon: "resume", external: true },
 ];
 
 // small line icons, drawn in the same stroke idiom as the project-card anchors

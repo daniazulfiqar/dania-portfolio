@@ -16,6 +16,9 @@ const PHOTO_SRC = "/dania.png";
 // the crowned claude mascot that pops out of the pocket alongside the note +
 // photo. intrinsic 1064×1176.
 const CLAUDE_SRC = "/images/claude_icon.png";
+// the light bulb that pops out of the pocket on the LEFT — mirror of the
+// claude mascot on the right. intrinsic 642×807.
+const BULB_SRC = "/images/light-bulb.svg";
 
 const ENVELOPE_SIZES =
   "(min-width: 1536px) 66rem, (min-width: 1280px) 58rem, (min-width: 1024px) 50rem, (min-width: 768px) 34rem, (min-width: 640px) 26rem, 20rem";
@@ -237,7 +240,12 @@ export function EnvelopeHero() {
   // claude sits nearer the centre on mobile (larger `right` = further from the
   // right edge) so it doesn't crowd the right side of the frame.
   const claudeBottom = useTransform(scrollYProgress, [0.05, photoEnd], ["18%", "91%"]);
-  const claudeRight = useTransform(scrollYProgress, [0.18, photoEnd], [isMobile ? "40%" : "27%", isMobile ? "26%" : "16%"]);
+  const claudeRight = useTransform(scrollYProgress, [0.18, photoEnd], [isMobile ? "40%" : "28%", isMobile ? "26%" : "21%"]);
+
+  // the light bulb: mirror of the claude mascot but on the LEFT side. same
+  // rise timing so the two rise together, one off each shoulder of the note.
+  const bulbBottom = useTransform(scrollYProgress, [0.05, photoEnd], ["18%", isMobile ? "87%" : "92%"]);
+  const bulbLeft = useTransform(scrollYProgress, [0.18, photoEnd], [isMobile ? "40%" : "20%", isMobile ? "26%" : "2%"]);
 
   // the whole envelope drifts up a touch and eases forward as you scroll, so
   // the scene feels alive rather than frozen while the note/photo come out.
@@ -279,6 +287,10 @@ export function EnvelopeHero() {
     ? { zIndex: 25, right: "16%", bottom: "84%", rotate: 0 }
     : { zIndex: 25, right: claudeRight, bottom: claudeBottom, rotate: 0 };
 
+  const bulbStyle = shouldReduceMotion
+    ? { zIndex: 25, left: "3%", bottom: "88%", rotate: 0 }
+    : { zIndex: 25, left: bulbLeft, bottom: bulbBottom, rotate: 0 };
+
   return (
     // this section is taller than the viewport on purpose: the extra height
     // below is the "scroll the first fold" distance that drives the opening.
@@ -297,7 +309,7 @@ export function EnvelopeHero() {
           <div className="pointer-events-none absolute inset-0" aria-hidden="true">
             <motion.div
               className="absolute inset-[-6%]"
-              style={shouldReduceMotion || isMobile ? undefined : { y: bgY }}
+              style={shouldReduceMotion ? undefined : { y: bgY }}
             >
               <Image
                 src="/hero-bg.jpg"
@@ -305,7 +317,7 @@ export function EnvelopeHero() {
                 fill
                 priority
                 sizes="100vw"
-                className="object-cover object-[center_96%] [filter:saturate(1.5)_contrast(1.14)_brightness(0.96)]"
+                className="origin-bottom scale-[1.4] object-cover object-[center_96%] [filter:saturate(1.5)_contrast(1.14)_brightness(0.96)] lg:scale-100"
               />
             </motion.div>
             {/* scroll-driven wash: strong at the top, clears to nothing as
@@ -425,7 +437,7 @@ export function EnvelopeHero() {
             {/* the crowned claude mascot — tucked inside the pocket at rest,
                 rising partway out on scroll, below the note + photo. */}
             <motion.div
-              className="absolute w-[11%] cursor-pointer"
+              className="absolute w-[11%] cursor-pointer lg:w-[9.5%]"
               style={claudeStyle}
               whileHover={shouldReduceMotion ? undefined : { y: -6 }}
               transition={{ type: "spring", stiffness: 220, damping: 18 }}
@@ -434,6 +446,27 @@ export function EnvelopeHero() {
               <div className="relative aspect-[1064/1176] w-full drop-shadow-[0_6px_12px_rgba(44,38,32,0.3)]">
                 <Image
                   src={CLAUDE_SRC}
+                  alt=""
+                  aria-hidden="true"
+                  fill
+                  sizes="(min-width: 1024px) 9rem, 5rem"
+                  className="object-contain"
+                />
+              </div>
+            </motion.div>
+
+            {/* the light bulb — mirror of the claude mascot on the LEFT,
+                tucked inside the pocket at rest, rising partway out on scroll. */}
+            <motion.div
+              className="absolute w-[11%] cursor-pointer"
+              style={bulbStyle}
+              whileHover={shouldReduceMotion ? undefined : { y: -6 }}
+              transition={{ type: "spring", stiffness: 220, damping: 18 }}
+              aria-hidden="true"
+            >
+              <div className="relative aspect-[642/807] w-full drop-shadow-[0_6px_12px_rgba(44,38,32,0.3)]">
+                <Image
+                  src={BULB_SRC}
                   alt=""
                   aria-hidden="true"
                   fill

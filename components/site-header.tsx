@@ -9,7 +9,7 @@ const NAV_LINKS: { label: string; href: string; external?: boolean }[] = [
   { label: "about", href: "#about" },
   { label: "work", href: "#work" },
   { label: "contact", href: "#contact" },
-  { label: "resume", href: "/Dania_Siddiqui_CV.pdf", external: true },
+  { label: "resume", href: "/Dania_Siddiqui_Resume.pdf", external: true },
 ];
 
 // socials — shown as icon logos in the desktop nav and in the mobile drawer.
@@ -156,7 +156,7 @@ export function SiteHeader() {
         }`}
       >
         <div className="flex h-[4.75rem] items-center justify-between px-5">
-          <span className="font-body text-xs uppercase tracking-[0.15em] text-ink-soft">menu</span>
+          <span aria-hidden="true" />
           <button
             type="button"
             onClick={() => setOpen(false)}
