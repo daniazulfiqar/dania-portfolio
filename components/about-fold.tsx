@@ -250,17 +250,17 @@ function IntroText() {
         variants={paraItem}
         className="font-body text-base leading-relaxed text-ink sm:text-base sm:leading-relaxed"
       >
-        I was born and raised in Karachi, Pakistan. i completed my A levels from
+        i was born and raised in Karachi, Pakistan. i completed my A levels from
         The Lyceum School and did my bachelor&apos;s in business administration
-        from <Mark order={0}>IBA Karachi</Mark> with a major in data analytics. I am
+        from <Mark order={0}>IBA Karachi</Mark> with a major in data analytics. i am
         someone who loved
-        being around numbers and math was always favourite for me!
+        being around numbers and math was always a favourite for me!
       </motion.p>
       <motion.p
         variants={paraItem}
         className="font-body text-base leading-relaxed text-ink-soft sm:text-base sm:leading-relaxed"
       >
-        I am currently a <Mark order={1}>lead product manager</Mark>, and over the past 5
+        i am currently a <Mark order={1}>lead product manager</Mark>, and over the past 5
         years i have worked across building B2C and B2B digital products for
         students, educators, institutions, and industrial manufacturers. lately
         i&apos;ve incorporated the use of agents into almost all the execution
@@ -321,9 +321,9 @@ function MaqsadText() {
         the product land!)
       </motion.p>
       <motion.p variants={paraItem} className="mt-5 font-body text-base leading-relaxed text-ink-soft sm:text-base sm:leading-relaxed">
-        at Maqsad i have built across both <Mark order={1}>b2c and b2b products</Mark>, the
+        at Maqsad i have built across both <Mark order={1}>B2C and B2B products</Mark>, the
         full user
-        journey from onboarding through payments to retention, plus the ai
+        journey from onboarding through payments to retention, plus the AI
         systems and agents running underneath.
       </motion.p>
       <motion.p variants={paraItem} className="mt-5 font-body text-base leading-relaxed text-ink-soft sm:text-base sm:leading-relaxed">
@@ -334,7 +334,7 @@ function MaqsadText() {
           hand-hold a student from before they enroll to the point they achieve
           their desired grade/admission
         </Mark>
-        . a student knows maqsad has them covered, and that&apos;s the brand the
+        . a student knows Maqsad has them covered, and that&apos;s the brand the
         product has built over the last 4 years.
       </motion.p>
     </ChapterText>
@@ -351,19 +351,19 @@ function FountainText() {
         this was a <Mark order={0}>personal project</Mark> for my dad&apos;s very
         traditional small-scale company. the company had been around for nearly
         30 years
-        with both b2b and b2c customers but no digital presence.
+        with both B2B and B2C customers but no digital presence.
       </motion.p>
       <motion.p variants={paraItem} className="mt-5 font-body text-base leading-relaxed text-ink-soft sm:text-base sm:leading-relaxed">
-        when my dad complained about not getting enough b2b orders due to lack
+        when my dad complained about not getting enough B2B orders due to lack
         of trust, and him not having enough resources to hire a designer or
         engineer, i{" "}
         <Mark order={1}>built him his very own e-commerce website from scratch</Mark> with
-        technical seo for visibility (thanks to claude code i am a builder now!)
+        technical SEO for visibility (thanks to claude code i am a builder now!)
       </motion.p>
       <motion.p variants={paraItem} className="mt-5 font-body text-base leading-relaxed text-ink-soft sm:text-base sm:leading-relaxed">
         my goal was to give an old-school industrial business the same product
         discovery experience you&apos;d expect from modern e-commerce, to{" "}
-        <Mark order={2}>build trust</Mark> with larger scale b2b companies who were
+        <Mark order={2}>build trust</Mark> with larger scale B2B companies who were
         previously hesitant to
         trust the product (my dad is super happy now, yay!)
       </motion.p>
