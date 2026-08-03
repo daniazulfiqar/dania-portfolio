@@ -27,6 +27,10 @@ export type GoodOne = {
   thumbnail?: "counsellor" | "pipeline";
   // the live thing itself, where that's better proof than screenshots.
   liveUrl?: string;
+  // a line or two shown in the expanded note, before the "here: <url>" link.
+  liveBlurb?: string;
+  // an optional aside rendered right after the link (e.g. a parenthetical).
+  liveNote?: string;
 };
 
 export const goodOnes: GoodOne[] = [
@@ -59,6 +63,10 @@ export const goodOnes: GoodOne[] = [
     icon: "chart",
     company: "maqsad",
     image: "/images/work/zero-to-admission-v3.png",
+    liveUrl: "https://maqsad.io",
+    liveBlurb: "you can explore the website",
+    liveNote:
+      "independently built and shipped the main website page to production",
   },
   {
     id: "fountain",
@@ -69,10 +77,20 @@ export const goodOnes: GoodOne[] = [
     icon: "compare",
     company: "fountain",
     image: "/images/work/fountain-v3.png",
-    // TODO: the live fountain site — drop the real url in here.
-    liveUrl: undefined,
+    liveUrl: "https://fountainpumps.com.pk",
+    liveBlurb: "in the meanwhile you can see the website",
   },
 ];
+
+// each company's taped logo — shown in the bottom-right of a card and at the
+// top of its case-study note. maps GoodOneCompany → the file in /public.
+export const COMPANY_LOGOS: Record<
+  GoodOneCompany,
+  { src: string; width: number; height: number }
+> = {
+  maqsad: { src: "/images/maqsad-logo.png", width: 1594, height: 471 },
+  fountain: { src: "/images/fountain-logo.png", width: 471, height: 100 },
+};
 
 // the sticky-note palette — yellow, pink, blue, green — indexed by a card's
 // position in `goodOnes`. shared by the work cards (components/projects-fold)

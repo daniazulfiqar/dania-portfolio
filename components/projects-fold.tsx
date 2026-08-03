@@ -9,28 +9,17 @@ import {
   useReducedMotion,
 } from "framer-motion";
 import {
+  COMPANY_LOGOS,
   goodOnes,
   NOTE_COLORS,
   noteColorFor,
   type GoodOne,
-  type GoodOneCompany,
   type GoodOneIcon,
 } from "@/lib/good-ones";
 import {
   CaseStudyModal,
   type OpenStudy,
 } from "@/components/case-study/case-study-modal";
-
-// the small brand mark tucked into each card's bottom-right corner. `width`/
-// `height` are the file's real pixels (so it never upscales); it's drawn small
-// via the className height, width auto.
-const COMPANY_LOGOS: Record<
-  GoodOneCompany,
-  { src: string; width: number; height: number }
-> = {
-  maqsad: { src: "/images/maqsad-logo.png", width: 1594, height: 471 },
-  fountain: { src: "/images/fountain-logo.png", width: 471, height: 100 },
-};
 
 // heading + the one-line lead-in above the row. voice: lowercase, first person.
 const HEADING = "what i've built";
@@ -395,18 +384,6 @@ function StickyCard({
               className="h-3.5 w-auto shrink-0 sm:h-4"
             />
           </div>
-
-          {/* sits above the stretched link so it wins the click. */}
-          {project.liveUrl && (
-            <a
-              href={project.liveUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="relative z-20 mt-3 inline-block font-script text-base text-wax underline-offset-2 hover:underline"
-            >
-              see it live →
-            </a>
-          )}
         </div>
       </motion.article>
     </motion.li>
@@ -433,8 +410,12 @@ export function ProjectsFold({ studies }: { studies: StudyContent }) {
         title: project.title,
         summary: project.summary,
         tags: project.tags,
+        company: project.company,
         note: noteColorFor(project.id),
         markdown: studies[project.id] ?? null,
+        liveUrl: project.liveUrl,
+        liveBlurb: project.liveBlurb,
+        liveNote: project.liveNote,
       });
     },
     [studies],

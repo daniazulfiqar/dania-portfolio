@@ -1,10 +1,18 @@
 "use client";
 
 import { useMemo, type ReactNode } from "react";
+import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import type { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { DRAFT_NOTE } from "@/lib/case-studies";
+import { COMPANY_LOGOS, type GoodOneCompany } from "@/lib/good-ones";
+
+// the note title — big (text-4xl) and one line on the wide desktop modal; on a
+// phone it drops to text-2xl (via the article's max-sm rule) and wraps rather
+// than shrinking to an unreadable size.
+const TITLE_CLASS =
+  "font-heading text-3xl font-semibold leading-tight text-ink max-sm:!text-[1.4rem] sm:text-4xl";
 
 // flatten a heading's children to plain text, then to a url-safe slug — used as
 // the heading's id so the in-note table of contents (case-study-toc) can jump
@@ -247,30 +255,74 @@ export function CaseStudyNoteBody({
   title,
   summary,
   tags,
+  company,
   markdown,
+  liveUrl,
+  liveBlurb,
+  liveNote,
   onOpenStudy,
 }: {
   title: string;
   summary?: string;
   tags?: string[];
+  company?: GoodOneCompany;
   markdown: string | null;
+  liveUrl?: string;
+  liveBlurb?: string;
+  liveNote?: string;
   onOpenStudy?: (slug: string) => void;
 }) {
   const components = useMemo(() => makeComponents(onOpenStudy), [onOpenStudy]);
+
+  // the company's logo sits where the "case study" eyebrow used to, tying the
+  // note back to the brand the work was for.
+  const logo = company ? COMPANY_LOGOS[company] : null;
+  const companyMark = logo && (
+    <Image
+      src={logo.src}
+      alt={`${company} logo`}
+      width={logo.width}
+      height={logo.height}
+      className="h-5 w-auto sm:h-6"
+    />
+  );
+
+  // a live link to the real thing, shown when the study carries one — a short
+  // blurb, then "here: <domain>" linking out to the site, then an optional aside.
+  const liveLink = liveUrl && (
+    <p className="mx-auto mt-8 max-w-xl font-body text-base leading-relaxed text-ink-soft">
+      {liveBlurb ? `${liveBlurb} ` : "you can see it live "}
+      here:{" "}
+      <a
+        href={liveUrl}
+        target="_blank"
+        rel="noreferrer"
+        className="font-semibold text-wax underline underline-offset-2 hover:text-wax/80"
+      >
+        {liveUrl.replace(/^https?:\/\//, "")}
+      </a>
+      {liveNote ? (
+        <span className="mt-2.5 block text-xs italic leading-relaxed text-ink-soft/70">
+          ({liveNote})
+        </span>
+      ) : (
+        "."
+      )}
+    </p>
+  );
 
   // no markdown on disk yet → this study is still a draft.
   if (!markdown) {
     return (
       <div className="text-center">
-        <p className="font-body text-xs uppercase tracking-[0.2em] text-ink/50">
-          case study
-        </p>
-        <h2 className="mx-auto mt-3 max-w-2xl font-heading text-3xl font-semibold leading-tight text-ink sm:text-4xl">
-          {title}
-        </h2>
+        {companyMark && (
+          <span className="mb-6 flex justify-center">{companyMark}</span>
+        )}
+        <h2 className={TITLE_CLASS}>{title}</h2>
         <p className="mx-auto mt-6 max-w-xl font-body text-base italic leading-relaxed text-ink-soft">
           {DRAFT_NOTE}
         </p>
+        {liveLink}
       </div>
     );
   }
@@ -278,19 +330,15 @@ export function CaseStudyNoteBody({
   return (
     <>
       <header>
-        <p className="mb-3 font-body text-xs uppercase tracking-[0.2em] text-ink/50">
-          case study
-        </p>
-        <h2 className="font-heading text-3xl font-semibold leading-tight text-ink sm:text-4xl">
-          {title}
-        </h2>
+        {companyMark && <span className="mb-6 flex">{companyMark}</span>}
+        <h2 className={TITLE_CLASS}>{title}</h2>
         {summary && (
-          <p className="mt-4 font-body text-lg leading-relaxed text-ink-soft">
+          <p className="mt-5 font-body text-lg leading-relaxed text-ink-soft">
             {summary}
           </p>
         )}
         {tags && tags.length > 0 && (
-          <ul className="mt-5 flex flex-wrap gap-1.5">
+          <ul className="mt-6 flex flex-wrap gap-1.5">
             {tags.map((tag) => (
               <li
                 key={tag}
@@ -313,6 +361,7 @@ export function CaseStudyNoteBody({
         >
           {markdown}
         </ReactMarkdown>
+        {liveLink}
       </div>
     </>
   );

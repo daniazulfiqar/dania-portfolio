@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { CaseStudyNoteBody } from "@/components/case-study/case-study-note";
 import { CaseStudyToc } from "@/components/case-study/case-study-toc";
+import type { GoodOneCompany } from "@/lib/good-ones";
 
 // the case study a card opens, as an in-page pop-up rather than a route change.
 // `study` being null means nothing's open (the overlay is unmounted).
@@ -12,8 +13,12 @@ export type OpenStudy = {
   title: string;
   summary?: string;
   tags?: string[];
+  company?: GoodOneCompany;
   note: string;
   markdown: string | null;
+  liveUrl?: string;
+  liveBlurb?: string;
+  liveNote?: string;
 };
 
 export function CaseStudyModal({
@@ -119,7 +124,11 @@ export function CaseStudyModal({
                 title={study.title}
                 summary={study.summary}
                 tags={study.tags}
+                company={study.company}
                 markdown={study.markdown}
+                liveUrl={study.liveUrl}
+                liveBlurb={study.liveBlurb}
+                liveNote={study.liveNote}
                 onOpenStudy={onOpenStudy}
               />
             </article>

@@ -64,6 +64,25 @@ const MID_Y = 55; // centre-line of the sine wave, stage px from the top
 const AMP_Y = 30; // wave amplitude — how far it rises/dips from the centre-line
 const CYCLES = 1.5; // sine cycles across the whole crossing (crest→trough→crest→trough)
 const PHASE = -1.1; // shifts the wave so the plane enters nearer a crest (higher) at the right edge
+
+// on desktop the wide stage flattens the entry, so the plane drifts in almost
+// level. we bump the amplitude and push the phase past the crest there, so on a
+// wide screen it enters from higher up and already banking steeply downward —
+// echoing how the squeezed-in narrow-width wave reads on mobile. mobile keeps
+// the original values (the wave already looks steep when the stage is narrow).
+const DESKTOP_MIN_W = 640;
+const AMP_Y_DESKTOP = 48; // bigger swing → steeper entry dive on the wide stage
+const PHASE_DESKTOP = -0.75;
+const MID_Y_DESKTOP = 30; // lower centre-line lifts the whole desktop wave up, so the plane enters higher
+function ampFor(w: number) {
+  return w >= DESKTOP_MIN_W ? AMP_Y_DESKTOP : AMP_Y;
+}
+function phaseFor(w: number) {
+  return w >= DESKTOP_MIN_W ? PHASE_DESKTOP : PHASE;
+}
+function midFor(w: number) {
+  return w >= DESKTOP_MIN_W ? MID_Y_DESKTOP : MID_Y;
+}
 const BANK = 0.6; // how strongly the plane banks into the curve's tangent
 const BANK_MAX = 22; // clamp on the bank angle, degrees
 const DOT_SPACING = 15; // approx px between trail dots
@@ -85,14 +104,14 @@ type Flight = {
 function flightX(w: number, t: number) {
   return w + OVERSHOOT - t * (w + 2 * OVERSHOOT);
 }
-function flightY(t: number) {
-  return MID_Y - AMP_Y * Math.cos(TWO_PI * CYCLES * t + PHASE);
+function flightY(w: number, t: number) {
+  return midFor(w) - ampFor(w) * Math.cos(TWO_PI * CYCLES * t + phaseFor(w));
 }
 function flightDX(w: number) {
   return -(w + 2 * OVERSHOOT); // constant leftward drift
 }
-function flightDY(t: number) {
-  return AMP_Y * TWO_PI * CYCLES * Math.sin(TWO_PI * CYCLES * t + PHASE);
+function flightDY(w: number, t: number) {
+  return ampFor(w) * TWO_PI * CYCLES * Math.sin(TWO_PI * CYCLES * t + phaseFor(w));
 }
 
 // build the wave for a given stage width: just the trail dots sampled along it
@@ -101,7 +120,7 @@ function buildFlight(w: number): Flight {
   const n = Math.min(220, Math.max(48, Math.round((w + 2 * OVERSHOOT) / DOT_SPACING)));
   const dots = Array.from({ length: n + 1 }, (_, i) => {
     const t = i / n;
-    return { x: flightX(w, t), y: flightY(t), t };
+    return { x: flightX(w, t), y: flightY(w, t), t };
   });
   return { w, cx: w / 2, dots };
 }
@@ -112,12 +131,12 @@ function planeX(f: Flight, t: number) {
   return flightX(f.w, t) - f.cx;
 }
 function planeY(f: Flight, t: number) {
-  return flightY(t) - REST_Y;
+  return flightY(f.w, t) - REST_Y;
 }
 function planeRot(f: Flight, t: number) {
   // bank into the tangent. nose points left at rotate 0, so travelling left is
   // neutral; +180 re-centres the angle there. damped + clamped to a lean.
-  let ang = (Math.atan2(flightDY(t), flightDX(f.w)) * 180) / Math.PI + 180;
+  let ang = (Math.atan2(flightDY(f.w, t), flightDX(f.w)) * 180) / Math.PI + 180;
   ang = (((ang % 360) + 540) % 360) - 180;
   return Math.max(-BANK_MAX, Math.min(BANK_MAX, ang * BANK));
 }
